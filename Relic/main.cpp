@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <Enemy.cpp>
 #include <iostream>
 
 void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroundBounds, sf::Vector2f playerPos, float playerRadius) {
@@ -30,16 +31,19 @@ int main()
     //Create a sprite to hold the background texture
     sf::Sprite bgSprite(bgTexture);
     bgSprite.setScale(3.0f, 3.0f);
-    bgSprite.setPosition(0.f, 0.f);
 
     //Get the bounds from background
     sf::FloatRect bgBounds = bgSprite.getLocalBounds();
     std::cout << "Background Bounds: Top: " << bgBounds.top << " Width: " << bgBounds.width << " Height: " << bgBounds.height << " Left: " << bgBounds.left << std::endl;
 
-
+    //Create the player
     sf::CircleShape player(20.0f);
     player.setFillColor(sf::Color::Green);
     player.setPosition(100.0f, 100.0f);
+
+    //Create the Enemy
+    Enemy newEnemy(20.f);
+    newEnemy.setPosition(120.f, 120.f);
 
     //Create a view that matches the size of the window
     sf::View view(sf::FloatRect(0, 0, bgBounds.width, bgBounds.height));
@@ -77,6 +81,7 @@ int main()
             {
                 std::cout << "Player Debug: X: " << player.getPosition().x << " Y: " << player.getPosition().y << std::endl;
             }
+            //newEnemy.reColor();
         }
 
         //Get current pos of circle
@@ -111,6 +116,7 @@ int main()
         //Draw the background sprite
         window.clear();
         window.draw(bgSprite);
+        window.draw(newEnemy.drawEnemy());
         window.draw(player);
 
         window.display();
