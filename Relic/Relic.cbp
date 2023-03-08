@@ -42,6 +42,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++14" />
 			<Add option="-DSFML_STATIC" />
 			<Add directory="../External Tools/SFML-2.5.1/SFML-2.5.1/include" />
 		</Compiler>

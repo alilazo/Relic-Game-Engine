@@ -1,19 +1,20 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
-void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroundBounds, sf::Vector2f shapePos, float shapeRadius) {
-    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroundBounds, sf::Vector2f playerPos, float playerRadius) {
+    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.0f));
     // Restrict the view to the visible area of the background sprite
-    if (view.getCenter().x - view.getSize().x / 2 < backgroundBounds.left + shapeRadius) {
-        view.setCenter(backgroundBounds.left + view.getSize().x / 2 + shapeRadius, view.getCenter().y);
+    if (view.getCenter().x - view.getSize().x / 2 < backgroundBounds.left + playerRadius) {
+        view.setCenter(backgroundBounds.left + view.getSize().x / 2 + playerRadius, view.getCenter().y);
     }
-    if (view.getCenter().y - view.getSize().y / 2 < backgroundBounds.top + shapeRadius) {
-        view.setCenter(view.getCenter().x, backgroundBounds.top + view.getSize().y / 2 + shapeRadius);
+    if (view.getCenter().y - view.getSize().y / 2 < backgroundBounds.top + playerRadius) {
+        view.setCenter(view.getCenter().x, backgroundBounds.top + view.getSize().y / 2 + playerRadius);
     }
-    if (view.getCenter().x + view.getSize().x / 2 > backgroundBounds.left + backgroundBounds.width - shapeRadius) {
-        view.setCenter(backgroundBounds.left + backgroundBounds.width - view.getSize().x / 2 - shapeRadius, view.getCenter().y);
+    if (view.getCenter().x + view.getSize().x / 2 > backgroundBounds.left + backgroundBounds.width - playerRadius) {
+        view.setCenter(backgroundBounds.left + backgroundBounds.width - view.getSize().x / 2 - playerRadius, view.getCenter().y);
     }
-    if (view.getCenter().y + view.getSize().y / 2 > backgroundBounds.top + backgroundBounds.height - shapeRadius) {
-        view.setCenter(view.getCenter().x, backgroundBounds.top + backgroundBounds.height - view.getSize().y / 2 - shapeRadius);
+    if (view.getCenter().y + view.getSize().y / 2 > backgroundBounds.top + backgroundBounds.height - playerRadius) {
+        view.setCenter(view.getCenter().x, backgroundBounds.top + backgroundBounds.height - view.getSize().y / 2 - playerRadius);
     }
 }
 
@@ -28,21 +29,23 @@ int main()
 
     //Create a sprite to hold the background texture
     sf::Sprite bgSprite(bgTexture);
-    bgSprite.setScale(2.0f, 2.0f);
+    bgSprite.setScale(3.0f, 3.0f);
+    bgSprite.setPosition(0.f, 0.f);
 
-    //Get the bounds
+    //Get the bounds from background
     sf::FloatRect bgBounds = bgSprite.getLocalBounds();
+    std::cout << "Background Bounds: Top: " << bgBounds.top << " Width: " << bgBounds.width << " Height: " << bgBounds.height << " Left: " << bgBounds.left << std::endl;
 
-    sf::CircleShape shape(50.0f);
-    shape.setFillColor(sf::Color::Green);
-    shape.setPosition(20.0f, 100.0f);
+
+    sf::CircleShape player(20.0f);
+    player.setFillColor(sf::Color::Green);
+    player.setPosition(100.0f, 100.0f);
 
     //Create a view that matches the size of the window
     sf::View view(sf::FloatRect(0, 0, bgBounds.width, bgBounds.height));
-    view.setCenter(bgBounds.width/2, bgBounds.height/2);
+    initView(view, view.getViewport(), bgBounds, player.getPosition(), player.getRadius());
 
-    initView(view, view.getViewport(), bgBounds, shape.getPosition(), shape.getRadius());
-
+    std::cout << "Finished init." << std::endl;
     while (window.isOpen())
     {
         sf::Event event;
@@ -52,49 +55,55 @@ int main()
                 window.close();
             else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right)
             {
-                shape.setFillColor(sf::Color::Red);
-                shape.setPosition(shape.getPosition().x + 20, shape.getPosition().y);
+                player.setFillColor(sf::Color::Red);
+                player.setPosition(player.getPosition().x + 20, player.getPosition().y);
             }
             else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Down)
             {
-                shape.setFillColor(sf::Color::Red);
-                shape.setPosition(shape.getPosition().x, shape.getPosition().y + 20);
+                player.setFillColor(sf::Color::Red);
+                player.setPosition(player.getPosition().x, player.getPosition().y + 20);
             }
             else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left)
             {
-                shape.setFillColor(sf::Color::Red);
-                shape.setPosition(shape.getPosition().x - 20, shape.getPosition().y);
+                player.setFillColor(sf::Color::Red);
+                player.setPosition(player.getPosition().x - 20, player.getPosition().y);
             }
             else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up)
             {
-                shape.setFillColor(sf::Color::Red);
-                shape.setPosition(shape.getPosition().x, shape.getPosition().y - 20);
+                player.setFillColor(sf::Color::Red);
+                player.setPosition(player.getPosition().x, player.getPosition().y - 20);
+            }
+            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)
+            {
+                std::cout << "Player Debug: X: " << player.getPosition().x << " Y: " << player.getPosition().y << std::endl;
             }
         }
-        //Get current pos of circle
-        sf::Vector2f circlePos = shape.getPosition();
-        float circleRadius = shape.getRadius();
 
-        //Check if the circle i outside the background bounds (COLLISION)
-        if (circlePos.x < bgBounds.left + shape.getRadius()) {
-            circlePos.x = bgBounds.left + shape.getRadius();
+        //Get current pos of circle
+        sf::Vector2f circlePos = player.getPosition();
+        float circleRadius = player.getRadius();
+
+        //Make the viewport stay in the bounds of the Background
+        //Make function that has offsets to integrate it to the camera Class.
+        if (circlePos.x < bgBounds.left + 230) {
+            circlePos.x = bgBounds.left + 230;
         }
-        else if (circlePos.x > bgBounds.left + bgBounds.width - shape.getRadius()) {
-            circlePos.x = bgBounds.left + bgBounds.width - shape.getRadius();
+        else if (circlePos.x > bgBounds.width + 730) {
+            circlePos.x = bgBounds.left + bgBounds.width + 730;
         }
-        if (circlePos.y < bgBounds.top + shape.getRadius()) {
-            circlePos.y = bgBounds.top + shape.getRadius();
+        if (circlePos.y < bgBounds.top + 230) {
+            circlePos.y = bgBounds.top + 230;
         }
-        else if (circlePos.y > bgBounds.top + bgBounds.height - shape.getRadius()) {
-            circlePos.y = bgBounds.top + bgBounds.height - shape.getRadius();
+        else if (circlePos.y > bgBounds.height + 730) {
+            circlePos.y = bgBounds.top + bgBounds.height + 730;
         }
 
         //TODO: Restrict the view to the background bounds.
-        sf::FloatRect visibleArea(circlePos - sf::Vector2f(view.getSize().x / 2.f, view.getSize().y / 2.f), view.getSize());
+        sf::FloatRect visibleArea(sf::Vector2f(view.getSize().x, view.getSize().y), view.getSize());
         initView(view, visibleArea, bgBounds, circlePos, circleRadius);
 
         //Update the view to the center on the circle with offset of radius
-        view.setCenter(circlePos);
+        view.setCenter(circlePos.x + player.getRadius(), circlePos.y + player.getRadius());
 
 
         window.setView(view);
@@ -102,8 +111,8 @@ int main()
         //Draw the background sprite
         window.clear();
         window.draw(bgSprite);
+        window.draw(player);
 
-        window.draw(shape);
         window.display();
     }
 
