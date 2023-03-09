@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <Enemy.cpp>
+#include <InputHandler.cpp>
 #include <iostream>
 
 void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroundBounds, sf::Vector2f playerPos, float playerRadius) {
@@ -21,7 +22,7 @@ void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroun
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1000, 800), "Powered by Relic");
+    sf::RenderWindow window(sf::VideoMode(1440, 720), "Powered by Relic");
     window.setFramerateLimit(60);
 
     //Load the background texture
@@ -30,7 +31,7 @@ int main()
 
     //Create a sprite to hold the background texture
     sf::Sprite bgSprite(bgTexture);
-    bgSprite.setScale(3.0f, 3.0f);
+    bgSprite.setScale(2.0f, 2.0f);
 
     //Get the bounds from background
     sf::FloatRect bgBounds = bgSprite.getLocalBounds();
@@ -46,8 +47,11 @@ int main()
     newEnemy.setPosition(120.f, 120.f);
 
     //Create a view that matches the size of the window
-    sf::View view(sf::FloatRect(0, 0, bgBounds.width, bgBounds.height));
+    sf::View view(sf::FloatRect(0, 0, 900, 500));
     initView(view, view.getViewport(), bgBounds, player.getPosition(), player.getRadius());
+
+    //Init the InputHandler
+    InputHandler defaultInput;
 
     std::cout << "Finished init." << std::endl;
     while (window.isOpen())
@@ -55,33 +59,10 @@ int main()
         sf::Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed){
                 window.close();
-            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right)
-            {
-                player.setFillColor(sf::Color::Red);
-                player.setPosition(player.getPosition().x + 20, player.getPosition().y);
             }
-            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Down)
-            {
-                player.setFillColor(sf::Color::Red);
-                player.setPosition(player.getPosition().x, player.getPosition().y + 20);
-            }
-            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left)
-            {
-                player.setFillColor(sf::Color::Red);
-                player.setPosition(player.getPosition().x - 20, player.getPosition().y);
-            }
-            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up)
-            {
-                player.setFillColor(sf::Color::Red);
-                player.setPosition(player.getPosition().x, player.getPosition().y - 20);
-            }
-            else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)
-            {
-                std::cout << "Player Debug: X: " << player.getPosition().x << " Y: " << player.getPosition().y << std::endl;
-            }
-            //newEnemy.reColor();
+            defaultInput.setHandler("arrows", player, event);
         }
 
         //Get current pos of circle

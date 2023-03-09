@@ -824,9 +824,10 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1678313308 source:c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\main.cpp
+1678321999 source:c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\main.cpp
 	<SFML/Graphics.hpp>
 	<Enemy.cpp>
+	<InputHandler.cpp>
 	<iostream>
 
 1677540074 c:\users\lazoa\desktop\relic engine\relic-game-engine\external tools\sfml-2.5.1\sfml-2.5.1\include\sfml\graphics.hpp
@@ -1241,4 +1242,9 @@
 1678313435 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\enemy.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
+
+1678321218 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\inputhandler.cpp
+	<SFML/Graphics.hpp>
+	<iostream>
+	<string>
 
