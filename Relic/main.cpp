@@ -48,8 +48,11 @@ int main()
     sf::FloatRect bgBounds = bgSprite.getLocalBounds();
 
     //Create the Enemy
-    Enemy newEnemy(20.f);
-    newEnemy.setPosition(120.f, 120.f);
+    sf::Texture enemyTexture;
+    if(!enemyTexture.loadFromFile("Resources/enemy.png")){ return EXIT_FAILURE; }
+    Enemy newEnemy(enemyTexture);
+    newEnemy.setPosition(220, 120);
+    newEnemy.setScale(0.3f, 0.3f);
 
     //Create bullet texture
     sf::Texture projectileTexture;
@@ -81,14 +84,12 @@ int main()
                     window.close();
                 }
             }
+
             gameInput.setMovementHandler("keyboard", event, fixedTimeStep);
             gameInput.setPlayerPositionToMouse(window);
 
-            //Get current pos of circle
             sf::Vector2f playerPos = player.getPosition();
 
-            //Make the viewport stay in the bounds of the Background
-            //Make function that has offsets to integrate it to the camera Class.
             if (playerPos.x < bgBounds.left + 430) {
                 playerPos.x = bgBounds.left + 430;
             } else if (playerPos.x > bgBounds.width - 470) {
@@ -101,11 +102,9 @@ int main()
                 playerPos.y = bgBounds.top + bgBounds.height - 270;
             }
 
-            //TODO: Restrict the view to the background bounds.
             sf::FloatRect visibleArea(sf::Vector2f(view.getSize().x, view.getSize().y), view.getSize());
             initView(view, visibleArea, bgBounds, playerPos, 20.f);
 
-            //Update the view to the center on the circle with offset of radius
             view.setCenter(playerPos.x + 20.f, playerPos.y + 20.f);
 
             accumulator -= fixedTimeStep;
@@ -116,7 +115,7 @@ int main()
         //Draw the background sprite
         window.clear();
         window.draw(bgSprite);
-        window.draw(newEnemy.drawEnemy());
+        window.draw(newEnemy);
 
         for (auto& projectile : gameInput.getProjectiles()) {
             projectile.update(deltaTime);
