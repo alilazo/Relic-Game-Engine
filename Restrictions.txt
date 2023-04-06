@@ -1,0 +1,2 @@
+BackGround = 1440 x 720
+Playing Field Cordinates = Anywhere from 0 x 0 to 1440 x 720.
