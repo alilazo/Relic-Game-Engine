@@ -2,6 +2,9 @@
 #include <Enemy.cpp>
 #include <InputHandler.cpp>
 #include <iostream>
+#include <Rock.cpp>
+#include <Health.cpp>
+#include <Player.cpp>
 
 //Use call by reference instead of value
 void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroundBounds, sf::Vector2f playerPos, float playerRadius) {
@@ -38,21 +41,38 @@ int main()
     sf::Sprite bgSprite(bgTexture);
     bgSprite.setScale(1.0f, 1.0f);
 
+    //Create a Rock.
+    sf::Texture rockTexture;
+    if(!rockTexture.loadFromFile("Resources/rock.png")){ return EXIT_FAILURE; }
+    Rock rock(rockTexture);
+    rock.setPosition(120.f, 120.f);
+    rock.setScale(0.1f, 0.1f);
+
     //Create a player sprite
     //TODO: Create a "Hitbox" for the player also initilize size of the players dimensions.
-    sf::Sprite player(playerTexture);
+    Player player(playerTexture);
     player.setScale(0.3f, 0.3f);
     player.setPosition(120.f, 120.f);
 
     //Get the bounds from background
     sf::FloatRect bgBounds = bgSprite.getLocalBounds();
 
-    //Create the Enemy
+    //Create the Enemy with Array
+    std::vector<Enemy*> enemies;
+
     sf::Texture enemyTexture;
     if(!enemyTexture.loadFromFile("Resources/enemy.png")){ return EXIT_FAILURE; }
-    Enemy newEnemy(enemyTexture);
-    newEnemy.setPosition(220, 120);
-    newEnemy.setScale(0.3f, 0.3f);
+    Enemy* newEnemy = new Enemy(enemyTexture);
+    newEnemy->setPosition(220, 120);
+    newEnemy->setScale(0.3f, 0.3f);
+    newEnemy->setHealth(100);
+    enemies.push_back(newEnemy);
+
+    Enemy* newEnemy2 = new Enemy(enemyTexture);
+    newEnemy2->setPosition(276, 170);
+    newEnemy2->setScale(0.3f, 0.3f);
+    newEnemy2->setHealth(100);
+    enemies.push_back(newEnemy2);
 
     //Create bullet texture
     sf::Texture projectileTexture;
@@ -63,6 +83,14 @@ int main()
 
     InputHandler gameInput(&player);
     gameInput.setProjectileTexture(projectileTexture);
+
+    Health playerHealth(100);
+    playerHealth.setPosition(10.f, 0.f);
+    player.setHealth(playerHealth.getHealth());
+
+    // Create a fixed view for the top left corner of the screen
+    sf::View fixedView(sf::FloatRect(0.f, 0.f, window.getSize().x/4.f, window.getSize().y/4.f));
+    fixedView.setViewport(sf::FloatRect(0.f, 0.f, 0.4f, 0.4f));
 
     std::cout << "Finished init." << std::endl;
 
@@ -112,15 +140,51 @@ int main()
 
         window.setView(view);
 
-        //Draw the background sprite
         window.clear();
-        window.draw(bgSprite);
-        window.draw(newEnemy);
 
-        for (auto& projectile : gameInput.getProjectiles()) {
-            projectile.update(deltaTime);
-            window.draw(projectile.getSprite());
+        window.draw(bgSprite);
+        window.draw(rock);
+
+        //This displays a unlimited amount of given enemies and also has projectile collision implemented here.
+        for (auto itEnemy = enemies.begin(); itEnemy != enemies.end(); ++itEnemy)
+        {
+            Enemy* currentEnemy = *itEnemy;
+            if(currentEnemy && currentEnemy->getHealth() >= 0){
+                window.draw(*currentEnemy);
+
+                //Calculate distance between player and enemy
+                sf::Vector2f playerPos = player.getPosition();
+                sf::Vector2f enemyPos = currentEnemy->getPosition();
+                float distance = std::sqrt(std::pow(playerPos.x - enemyPos.x, 2) + std::pow(playerPos.y - enemyPos.y, 2));
+
+                //If player is within a certain radius, move towards the player
+                if(distance <= 200) {
+                    float angle = std::atan2(playerPos.y - enemyPos.y, playerPos.x - enemyPos.x);
+                    currentEnemy->move(std::cos(angle) * 50.0f * deltaTime, std::sin(angle) * 50.0f * deltaTime);
+                }
+            }
+
+            for (auto itProjectile = gameInput.getProjectiles().begin(); itProjectile != gameInput.getProjectiles().end(); )
+            {
+                itProjectile->update(deltaTime);
+                itProjectile->setDamage(25);
+                if (itProjectile->getSprite().getGlobalBounds().intersects(currentEnemy->getGlobalBounds()) && currentEnemy->getHealth() >= 0 || itProjectile->getSprite().getGlobalBounds().intersects(rock.getGlobalBounds()))
+                {
+                    if(currentEnemy->getHealth() >= 0 && currentEnemy->collidesWith(itProjectile->getSprite())) {
+                            std::cout << "\nHit, Enemy health is: " <<  currentEnemy->getHealth() << std::endl;
+                            currentEnemy->handleCollision(*itProjectile);
+                    }
+                    itProjectile = gameInput.getProjectiles().erase(itProjectile);
+                    continue;
+                }
+                window.draw(itProjectile->getSprite());
+                ++itProjectile;
+            }
         }
+
+        window.setView(fixedView);
+        window.draw(playerHealth);
+        window.setView(view);
 
         window.draw(player);
         window.display();

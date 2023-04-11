@@ -15,6 +15,7 @@ private:
     bool downKeyPressed;
     bool leftKeyPressed;
     bool upKeyPressed;
+    sf::Clock shootClock;
 public:
     InputHandler(sf::Sprite *p) { player = p; rightKeyPressed = false; downKeyPressed = false; leftKeyPressed = false; upKeyPressed = false; }
     void setMovementHandler(std::string setting, sf::Event event, float deltaTime);
@@ -35,8 +36,8 @@ void InputHandler::setPlayerPositionToMouse(sf::RenderWindow &window){
     float dy = mousePos.y - playerPos.y;
     float angle = atan2(dy, dx) * 180 / M_PI;
 
-    player->setOrigin(player->getLocalBounds().width / 2.f, player->getLocalBounds().height / 2.f);
     player->setRotation(angle);
+
     //std::cout << "Origin X:" << player->getOrigin().x << ",    Y:" << player->getOrigin().y << ".   Dx " << dx << "    Dy " << dy << "      Player Width: " << player->getLocalBounds().width << "   Height: " << player->getLocalBounds().height << std::endl;
 }
 
@@ -138,9 +139,13 @@ void InputHandler::setMovementHandler(std::string setting, sf::Event event, floa
 }
 
 void InputHandler::shoot(){
+    if (shootClock.getElapsedTime().asSeconds() < 0.2) { // Change 0.5 to the desired delay in seconds
+        return;
+    }
+    shootClock.restart();
     sf::Vector2f playerPos = sf::Vector2f(player->getPosition().x, player->getPosition().y);
     float playerAngle = player->getRotation();
-    Projectile projectile(projectileTexture, 600.f, playerPos, playerAngle);
+    Projectile projectile(projectileTexture, 600.f, playerPos, playerAngle, 25);
     projectiles.push_back(projectile);
     std::cout << "Pew";
 }
