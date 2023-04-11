@@ -5,6 +5,89 @@
 #include <Rock.cpp>
 #include <Health.cpp>
 #include <Player.cpp>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <ObjectData.cpp>
+
+//Map Reader implementation
+std::string trim(const std::string& str) {
+    auto first = std::find_if_not(str.begin(), str.end(), [](int c) { return std::isspace(c); });
+    auto last = std::find_if_not(str.rbegin(), str.rend(), [](int c) { return std::isspace(c); }).base();
+    return (first >= last) ? std::string() : std::string(first, last);
+}
+
+std::vector<ObjectData> readMapData(const std::string& filename) {
+    std::vector<ObjectData> objects;
+
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return objects;
+    }
+
+    std::string line;
+    std::string currentSection = "";
+    ObjectData currentObject;
+
+    while (std::getline(file, line)) {
+        line = trim(line);
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+
+        if (line[0] == '[' && line.back() == ']') {
+            currentSection = line.substr(1, line.size() - 2);
+            continue;
+        }
+
+        std::string key, value;
+        std::istringstream iss(line);
+        if (std::getline(iss, key, '=') && std::getline(iss, value)) {
+            key = trim(key);
+            value = trim(value);
+
+            if (key == "Texture") {
+                currentObject.texture = value;
+            } else if (key == "Position") {
+                std::string::size_type pos = value.find(' ');
+                if (pos != std::string::npos) {
+                    currentObject.posX = std::stof(value.substr(0, pos));
+                    currentObject.posY = std::stof(value.substr(pos + 1));
+                }
+            } else if (key == "Scale") {
+                std::string::size_type pos = value.find(' ');
+                if (pos != std::string::npos) {
+                    currentObject.scaleX = std::stof(value.substr(0, pos));
+                    currentObject.scaleY = std::stof(value.substr(pos + 1));
+                }
+            } else if (key == "Health") {
+                currentObject.health = std::stoi(value);
+            } else if (key == "Damage") {
+                currentObject.damage = std::stoi(value);
+            } else {
+                std::cerr << "Invalid key: " << key << std::endl;
+            }
+        } else {
+            std::cerr << "Failed to parse line: " << line << std::endl;
+        }
+
+        if (currentObject.texture != "") {
+            currentObject.type = currentSection;
+            objects.push_back(currentObject);
+            currentObject = ObjectData();
+        }
+    }
+
+    if (currentObject.texture != "") {
+        currentObject.type = currentSection;
+        objects.push_back(currentObject);
+    }
+
+    file.close();
+    return objects;
+}
 
 //Use call by reference instead of value
 void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroundBounds, sf::Vector2f playerPos, float playerRadius) {
@@ -29,17 +112,48 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1440, 720), "Powered by Relic");
     window.setFramerateLimit(60);
 
+    std::vector<ObjectData> objectList = readMapData("Maps/Room1.txt");
+
+    //Initialization
+    sf::Clock playerCollisionClock;
+
+
+    std::cout << "Objects: " << objectList.size() << std::endl;
+    for(int i = 0; i < objectList.size(); i++){
+        std::cout << objectList[i].type << "    -   " << objectList[i].texture << std::endl;
+    }
+
     //Load the background texture
     sf::Texture bgTexture;
-    if(!bgTexture.loadFromFile("Resources/Background.jpg")){ return EXIT_FAILURE; }
-
-    //Create the player Texture
-    sf::Texture playerTexture;
-    if(!playerTexture.loadFromFile("Resources/player.png")){ return EXIT_FAILURE; }
+    if(!bgTexture.loadFromFile(objectList[0].texture)){ return EXIT_FAILURE; }
 
     //Create a sprite to hold the background texture
     sf::Sprite bgSprite(bgTexture);
-    bgSprite.setScale(1.0f, 1.0f);
+
+
+    sf::Texture playerTexture;
+    Player player(playerTexture);
+
+    for (const auto& obj : objectList) {
+        if (obj.type == "Player") {
+            sf::Texture tempPlayerTexture;
+            tempPlayerTexture.loadFromFile(obj.texture);
+
+            // Create the player sprite
+            Player tempPlayer(tempPlayerTexture);
+            tempPlayer.setScale(obj.scaleX, obj.scaleY);
+            tempPlayer.setPosition(obj.posX, obj.posY);
+
+            player = tempPlayer;
+            playerTexture = tempPlayerTexture;
+
+            // ...
+        }
+    }
+    // Create the player sprite
+    //player.setScale(objectList[1].scaleX, objectList[1].scaleY);
+    //player.setPosition(objectList[1].posX, objectList[1].posY);
+    std::cout << objectList[1].scaleX << "   " << objectList[1].scaleY << "   " << objectList[1].posX << "  " << objectList[1].posY <<  std::endl;
 
     //Create a Rock.
     sf::Texture rockTexture;
@@ -47,12 +161,6 @@ int main()
     Rock rock(rockTexture);
     rock.setPosition(120.f, 120.f);
     rock.setScale(0.1f, 0.1f);
-
-    //Create a player sprite
-    //TODO: Create a "Hitbox" for the player also initilize size of the players dimensions.
-    Player player(playerTexture);
-    player.setScale(0.3f, 0.3f);
-    player.setPosition(120.f, 120.f);
 
     //Get the bounds from background
     sf::FloatRect bgBounds = bgSprite.getLocalBounds();
@@ -96,6 +204,7 @@ int main()
 
     //Fixed time step system
     sf::Clock clock;
+
     const float fixedTimeStep = 1.0f / 60.0f;
     float accumulator = 0.0f;
 
@@ -158,9 +267,26 @@ int main()
                 float distance = std::sqrt(std::pow(playerPos.x - enemyPos.x, 2) + std::pow(playerPos.y - enemyPos.y, 2));
 
                 //If player is within a certain radius, move towards the player
-                if(distance <= 200) {
+                if(distance <= 600) {
                     float angle = std::atan2(playerPos.y - enemyPos.y, playerPos.x - enemyPos.x);
+                    currentEnemy->setRotation(angle * 180 / M_PI);
                     currentEnemy->move(std::cos(angle) * 50.0f * deltaTime, std::sin(angle) * 50.0f * deltaTime);
+                }
+            }
+
+            //Check for player collision with enemy
+            if (player.collidesWith(*currentEnemy) && player.isAlive) {
+                if(player.getHealth() <= 0) {
+                    player.isAlive = false;
+                    player.setHealth(0);
+                } else {
+         if (playerCollisionClock.getElapsedTime().asSeconds() >= 0.5f) {
+            int damage = currentEnemy->getDamage();
+            player.setHealth(player.getHealth() - damage);
+            std::cout << "Player health: " << player.getHealth() << std::endl;
+            playerHealth.decreaseHealth(damage);
+            playerCollisionClock.restart();
+        }
                 }
             }
 

@@ -1,0 +1,37 @@
+#Special Commenting Feature
+
+Position = 0 0
+Scale = 1 1
+[Background]
+Texture = Resources/Background.jpg
+
+Position = 120.0 120.0
+Scale = 0.3 0.3
+[Player]
+Texture = Resources/player.png
+
+Position = 240 250
+Scale = 0.1 0.1
+[Rock1]
+Texture = Resources/rock.png
+
+Position = 150 150
+Scale = 0.1 0.1
+[Rock2]
+Texture = Resources/rock.png
+Position = 350 350
+Scale = 0.1 0.1
+
+[Enemy1]
+Texture = Resources/enemy.png
+Position = 220 120
+Scale = 0.3 0.3
+Health = 100
+Damage = 25
+
+[Enemy2]
+Texture = Resources/enemy.png
+Position = 220 120
+Scale = 0.3 0.3
+Health = 100
+Damage = 15

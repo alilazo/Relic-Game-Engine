@@ -8,12 +8,13 @@ public:
     Enemy(sf::Texture&);
     void setX(float);
     void setY(float);
-    void updatePosition(sf::Vector2f, float, float, float);
     void setPosition(float x, float y);
     float getX() {return x; }
     float getY() {return y; }
     int getHealth() {return health; }
     void setHealth(int newHealth) {health = newHealth; }
+    int getDamage() { return damage; }
+    void setDamage(int dmg) { damage = dmg; }
     bool collidesWith(const sf::Sprite& other) const {
         return getGlobalBounds().intersects(other.getGlobalBounds());
     }
@@ -23,6 +24,7 @@ public:
             health -= projectile.getDamage();
             if (health <= 0) {
                 std::cout << "Enemy died" << std::endl;
+                setDamage(0);
             }
         }
     }
@@ -30,10 +32,13 @@ private:
     float x;
     float y;
     int health;
+    int damage;
+    bool isDead = health <= 0;
 };
 
 Enemy::Enemy(sf::Texture &enemyTexture){
     this->setTexture(enemyTexture);
+    this->damage = 25;
     std::cout << "New enemy created! ";
 }
 
@@ -50,24 +55,4 @@ void Enemy::setX(float xPos){
 
 void Enemy::setY(float yPos){
     y = yPos;
-}
-
-void Enemy::updatePosition(sf::Vector2f playerPosition, float deltaTime, float moveSpeed, float radius) {
-    // Calculate distance between enemy and player
-    float dx = playerPosition.x - x;
-    float dy = playerPosition.y - y;
-    float distance = sqrt(dx * dx + dy * dy);
-
-    // Check if player is within radius
-    if (distance < radius) {
-        // Calculate angle between enemy and player
-        float angle = atan2(dy, dx) * 180 / M_PI;
-
-        // Move enemy in the direction of the player
-        x += moveSpeed * deltaTime * cos(angle * M_PI / 180);
-        y += moveSpeed * deltaTime * sin(angle * M_PI / 180);
-
-        // Update enemy sprite position
-        setPosition(x, y);
-    }
 }

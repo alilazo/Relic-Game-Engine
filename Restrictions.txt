@@ -2,3 +2,5 @@ BackGround = 1440 x 720
 Playing Field Cordinates = Anywhere from 0 x 0 to 1440 x 720.
 To Change Health Font use setFontFile. Default is Zomboid.ttf
 Pointer deletion for saving memory. 
+Use a custom made collidesWith function in Sprites for collision detection.
+Checking if the player is alive using isAlive;
