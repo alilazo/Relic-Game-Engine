@@ -42,3 +42,21 @@ Damage = 15
 Score = 20
 Texture = Resources/enemy.png
 [Enemy]
+
+[Enemy]
+Position = 420 720
+Scale = 0.3 0.3
+Health = 100
+Damage = 15
+Score = 10
+Texture = Resources/enemy.png
+[Enemy]
+
+[Enemy]
+Position = 720 520
+Scale = 0.3 0.3
+Health = 320
+Damage = 15
+Score = 30
+Texture = Resources/enemy.png
+[Enemy]

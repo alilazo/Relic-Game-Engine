@@ -10,6 +10,7 @@
 #include <vector>
 #include <sstream>
 #include <ObjectData.cpp>
+#include <Score.cpp>
 
 //Map Reader implementation
 std::string trim(const std::string& str) {
@@ -64,9 +65,14 @@ std::vector<ObjectData> readMapData(const std::string& filename) {
                 }
             } else if (key == "Health") {
                 currentObject.health = std::stoi(value);
+                std::cout << currentSection << "  Health: " << currentObject.health << std::endl;
             } else if (key == "Damage") {
                 currentObject.damage = std::stoi(value);
-            } else {
+                std::cout << currentSection << "  Damage: " << currentObject.damage << std::endl;
+            } else if (key == "Score"){
+                currentObject.score = std::stoi(value);
+                std::cout << currentSection << "  Damage: " << currentObject.score << std::endl;
+            }else{
                 std::cerr << "Invalid key: " << key << std::endl;
             }
         } else {
@@ -112,93 +118,89 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1440, 720), "Powered by Relic");
     window.setFramerateLimit(60);
 
-    std::vector<ObjectData> objectList = readMapData("Maps/Room1.txt");
-
     //Initialization
+    std::vector<ObjectData> objectList = readMapData("Maps/Room1.txt");
+    std::vector<Rock> rockList;
+    std::vector<Enemy*> enemies;
     sf::Clock playerCollisionClock;
+    sf::Texture rockTexture;
+    sf::Texture enemyTexture;
+    enemyTexture.loadFromFile("Resources/enemy.png");
+    rockTexture.loadFromFile("Resources/rock.png");
 
 
+    //Displays all the objects captured by readMapData
     std::cout << "Objects: " << objectList.size() << std::endl;
     for(int i = 0; i < objectList.size(); i++){
         std::cout << objectList[i].type << "    -   " << objectList[i].texture << std::endl;
+        std::cout << "PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl << std::endl;
     }
 
     //Load the background texture
     sf::Texture bgTexture;
     if(!bgTexture.loadFromFile(objectList[0].texture)){ return EXIT_FAILURE; }
-
-    //Create a sprite to hold the background texture
     sf::Sprite bgSprite(bgTexture);
 
 
+    //Create the player
     sf::Texture playerTexture;
+    playerTexture.loadFromFile(objectList[1].texture);
     Player player(playerTexture);
 
-    for (const auto& obj : objectList) {
-        if (obj.type == "Player") {
-            sf::Texture tempPlayerTexture;
-            tempPlayerTexture.loadFromFile(obj.texture);
+    player.setScale(objectList[1].scaleX, objectList[1].scaleY);
+    player.setPosition(objectList[1].posX, objectList[1].posY);
 
-            // Create the player sprite
-            Player tempPlayer(tempPlayerTexture);
-            tempPlayer.setScale(obj.scaleX, obj.scaleY);
-            tempPlayer.setPosition(obj.posX, obj.posY);
-
-            player = tempPlayer;
-            playerTexture = tempPlayerTexture;
-
-            // ...
+    //Rock Creation
+    for(const auto& obj : objectList){
+        if(obj.type.find("Rock") != std::string::npos){
+            Rock rock(rockTexture);
+            rock.setPosition(obj.posX, obj.posY);
+            rock.setScale(obj.scaleX, obj.scaleY);
+            rockList.push_back(rock);
         }
     }
-    // Create the player sprite
-    //player.setScale(objectList[1].scaleX, objectList[1].scaleY);
-    //player.setPosition(objectList[1].posX, objectList[1].posY);
-    std::cout << objectList[1].scaleX << "   " << objectList[1].scaleY << "   " << objectList[1].posX << "  " << objectList[1].posY <<  std::endl;
-
-    //Create a Rock.
-    sf::Texture rockTexture;
-    if(!rockTexture.loadFromFile("Resources/rock.png")){ return EXIT_FAILURE; }
-    Rock rock(rockTexture);
-    rock.setPosition(120.f, 120.f);
-    rock.setScale(0.1f, 0.1f);
 
     //Get the bounds from background
     sf::FloatRect bgBounds = bgSprite.getLocalBounds();
 
     //Create the Enemy with Array
-    std::vector<Enemy*> enemies;
+    for (const auto& obj : objectList) {
+        if (obj.type == "Enemy") {
+            Enemy* newEnemy = new Enemy(enemyTexture);
+            newEnemy->setPosition(obj.posX, obj.posY);
+            newEnemy->setScale(obj.scaleX, obj.scaleY);
+            newEnemy->setHealth(obj.health);
+            newEnemy->setDamage(obj.damage);
+            newEnemy->setScore(obj.score);
+            std::cout << "Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << std::endl;
+            std::cout << "Enemy ScaleX: " << newEnemy->getScale().x << "  ScaleY: " << newEnemy->getScale().y << std::endl;
+            enemies.push_back(newEnemy);
+        }
+    }
 
-    sf::Texture enemyTexture;
-    if(!enemyTexture.loadFromFile("Resources/enemy.png")){ return EXIT_FAILURE; }
-    Enemy* newEnemy = new Enemy(enemyTexture);
-    newEnemy->setPosition(220, 120);
-    newEnemy->setScale(0.3f, 0.3f);
-    newEnemy->setHealth(100);
-    enemies.push_back(newEnemy);
-
-    Enemy* newEnemy2 = new Enemy(enemyTexture);
-    newEnemy2->setPosition(276, 170);
-    newEnemy2->setScale(0.3f, 0.3f);
-    newEnemy2->setHealth(100);
-    enemies.push_back(newEnemy2);
-
-    //Create bullet texture
+    //Create bullet
     sf::Texture projectileTexture;
     if(!projectileTexture.loadFromFile("Resources/Bullet.png")){ return EXIT_FAILURE; }
 
     sf::View view(sf::FloatRect(0, 0, 900, 500));
     initView(view, view.getViewport(), bgBounds, player.getPosition(), 20.f);
 
+    //Setting players input handler
     InputHandler gameInput(&player);
     gameInput.setProjectileTexture(projectileTexture);
 
+    //Setting players health
     Health playerHealth(100);
     playerHealth.setPosition(10.f, 0.f);
     player.setHealth(playerHealth.getHealth());
 
-    // Create a fixed view for the top left corner of the screen
-    sf::View fixedView(sf::FloatRect(0.f, 0.f, window.getSize().x/4.f, window.getSize().y/4.f));
-    fixedView.setViewport(sf::FloatRect(0.f, 0.f, 0.4f, 0.4f));
+    //Setting players score
+    Score score(0);
+    score.setPosition(10.f, 50.f);
+
+    //Fixed view for Players Health
+    sf::View fixedViewPlayerHealthScore(sf::FloatRect(0.f, 0.f, window.getSize().x/4.f, window.getSize().y/4.f));
+    fixedViewPlayerHealthScore.setViewport(sf::FloatRect(0.f, 0.f, 0.4f, 0.4f));
 
     std::cout << "Finished init." << std::endl;
 
@@ -222,11 +224,13 @@ int main()
                 }
             }
 
+            //Setting the options for the user input
             gameInput.setMovementHandler("keyboard", event, fixedTimeStep);
             gameInput.setPlayerPositionToMouse(window);
 
             sf::Vector2f playerPos = player.getPosition();
 
+            //Camera bounds.
             if (playerPos.x < bgBounds.left + 430) {
                 playerPos.x = bgBounds.left + 430;
             } else if (playerPos.x > bgBounds.width - 470) {
@@ -247,18 +251,24 @@ int main()
             accumulator -= fixedTimeStep;
         }
 
+        score.setScore(player.getScore());
+
         window.setView(view);
 
         window.clear();
 
         window.draw(bgSprite);
-        window.draw(rock);
+
+        //Draws each rock in the vector.
+        for(const auto& rock : rockList){
+            window.draw(rock);
+        }
 
         //This displays a unlimited amount of given enemies and also has projectile collision implemented here.
         for (auto itEnemy = enemies.begin(); itEnemy != enemies.end(); ++itEnemy)
         {
             Enemy* currentEnemy = *itEnemy;
-            if(currentEnemy && currentEnemy->getHealth() >= 0){
+            if(currentEnemy && currentEnemy->getHealth() > 0){
                 window.draw(*currentEnemy);
 
                 //Calculate distance between player and enemy
@@ -280,13 +290,19 @@ int main()
                     player.isAlive = false;
                     player.setHealth(0);
                 } else {
-         if (playerCollisionClock.getElapsedTime().asSeconds() >= 0.5f) {
-            int damage = currentEnemy->getDamage();
-            player.setHealth(player.getHealth() - damage);
-            std::cout << "Player health: " << player.getHealth() << std::endl;
-            playerHealth.decreaseHealth(damage);
-            playerCollisionClock.restart();
-        }
+                     if (playerCollisionClock.getElapsedTime().asSeconds() >= 0.5f) {
+                        int damage = currentEnemy->getDamage();
+                        if(player.getHealth() - damage <= 0 ){
+                            player.isAlive = false;
+                            playerHealth.setHealth(0);
+                            player.setHealth(0);
+                        } else {
+                        player.setHealth(player.getHealth() - damage);
+                        std::cout << "Player health: " << player.getHealth() << std::endl;
+                        playerHealth.decreaseHealth(damage);
+                        playerCollisionClock.restart();
+                        }
+                    }
                 }
             }
 
@@ -294,25 +310,41 @@ int main()
             {
                 itProjectile->update(deltaTime);
                 itProjectile->setDamage(25);
-                if (itProjectile->getSprite().getGlobalBounds().intersects(currentEnemy->getGlobalBounds()) && currentEnemy->getHealth() >= 0 || itProjectile->getSprite().getGlobalBounds().intersects(rock.getGlobalBounds()))
+
+                //Projectile Rock Collision
+                bool intersectsRock = false;
+                for (const auto& rock : rockList) {
+                    if (itProjectile->getSprite().getGlobalBounds().intersects(rock.getGlobalBounds())) {
+                        intersectsRock = true;
+                        break;
+                    }
+                }
+
+                //Projectile Collision
+                if (itProjectile->getSprite().getGlobalBounds().intersects(currentEnemy->getGlobalBounds()) && currentEnemy->getHealth() >= 0 || intersectsRock)
                 {
+
                     if(currentEnemy->getHealth() >= 0 && currentEnemy->collidesWith(itProjectile->getSprite())) {
                             std::cout << "\nHit, Enemy health is: " <<  currentEnemy->getHealth() << std::endl;
-                            currentEnemy->handleCollision(*itProjectile);
+                            currentEnemy->handleCollision(*itProjectile, player);
                     }
                     itProjectile = gameInput.getProjectiles().erase(itProjectile);
                     continue;
                 }
+
+
                 window.draw(itProjectile->getSprite());
                 ++itProjectile;
             }
         }
 
-        window.setView(fixedView);
+        window.draw(player);
+
+        window.setView(fixedViewPlayerHealthScore);
+        window.draw(score);
         window.draw(playerHealth);
         window.setView(view);
 
-        window.draw(player);
         window.display();
     }
 

@@ -4,3 +4,6 @@ To Change Health Font use setFontFile. Default is Zomboid.ttf
 Pointer deletion for saving memory. 
 Use a custom made collidesWith function in Sprites for collision detection.
 Checking if the player is alive using isAlive;
+
+Creating maps:
+First must have the following order, Background then Player.

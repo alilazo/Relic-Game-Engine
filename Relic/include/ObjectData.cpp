@@ -8,11 +8,12 @@ public:
     float scaleY;
     int health = 0;
     int damage = 0;
+    int score = 0;
 
     ObjectData() {}
 
-    ObjectData(std::string type, std::string texture, float posX, float posY, float scaleX, float scaleY, int health = 0, int damage = 0)
-        : type(type), texture(texture), posX(posX), posY(posY), scaleX(scaleX), scaleY(scaleY), health(health), damage(damage) {}
+    ObjectData(std::string type, std::string texture, float posX, float posY, float scaleX, float scaleY, int health = 0, int damage = 0, int score = 0)
+        : type(type), texture(texture), posX(posX), posY(posY), scaleX(scaleX), scaleY(scaleY), health(health), damage(damage), score(score) {}
 
     // Getters
     std::string getType() const { return type; }
@@ -23,4 +24,5 @@ public:
     float getScaleY() const { return scaleY; }
     int getHealth() const { return health; }
     int getDamage() const { return damage; }
+    int getScore() const { return score; }
 };

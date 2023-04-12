@@ -139,7 +139,7 @@ void InputHandler::setMovementHandler(std::string setting, sf::Event event, floa
 }
 
 void InputHandler::shoot(){
-    if (shootClock.getElapsedTime().asSeconds() < 0.2) { // Change 0.5 to the desired delay in seconds
+    if (shootClock.getElapsedTime().asSeconds() < 0.3) { // Change 0.5 to the desired delay in seconds
         return;
     }
     shootClock.restart();

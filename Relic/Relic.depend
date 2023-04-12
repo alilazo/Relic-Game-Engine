@@ -829,7 +829,7 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1681249165 source:c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\main.cpp
+1681328788 source:c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\main.cpp
 	<SFML/Graphics.hpp>
 	<Enemy.cpp>
 	<InputHandler.cpp>
@@ -842,6 +842,7 @@
 	<vector>
 	<sstream>
 	<ObjectData.cpp>
+	<Score.cpp>
 
 1677543674 c:\users\lazoa\desktop\relic engine\relic-game-engine\external tools\sfml-2.5.1\sfml-2.5.1\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -1252,12 +1253,13 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1681228568 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\enemy.cpp
+1681328862 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\enemy.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<Projectile.cpp>
+	<Player.cpp>
 
-1681225772 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\inputhandler.cpp
+1681328713 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\inputhandler.cpp
 	<SFML/Graphics.hpp>
 	<cmath>
 	<iostream>
@@ -1309,8 +1311,10 @@
 	<iostream>
 	<sstream>
 
-1681228853 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\player.cpp
+1681326017 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\player.cpp
 	<SFML/Graphics.hpp>
 
-1681245703 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\objectdata.cpp
+1681324691 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\objectdata.cpp
+
+1681323870 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\score.cpp
 
