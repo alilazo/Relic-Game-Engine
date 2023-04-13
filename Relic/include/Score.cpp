@@ -1,3 +1,5 @@
+#ifndef SCORE_H
+#define SCORE_H
 class Score : public sf::Text {
 private:
     int score;
@@ -51,3 +53,4 @@ public:
         updateText();
     }
 };
+#endif

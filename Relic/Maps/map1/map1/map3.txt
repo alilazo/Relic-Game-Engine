@@ -3,7 +3,7 @@
 [Background]
 Position = 0 0
 Scale = 1 1
-Texture = Resources/Background.jpg
+Texture = Resources/map1/HellsMaze.png
 [Background]
 
 [Player]
@@ -12,23 +12,12 @@ Scale = 0.3 0.3
 Texture = Resources/player.png
 [Player]
 
-[Door]
-Position = 435.0 0.0
-Scale = 0.3 0.3
-Texture = Resources/Door.png
-[Door]
-
-[Key]
-Position = 0.0 0.0
-Scale = 0.3 0.3
-Texture = Resources/Key.png
-[Key]
-
 [Rock1]
 Position = 240 250
 Scale = 0.1 0.1
 Texture = Resources/rock.png
 [Rock1]
+
 
 [Rock2]
 Position = 350 350
@@ -42,7 +31,6 @@ Health = 100
 Damage = 25
 Scale = 0.3 0.3
 Score = 10
-Medkit = true
 Texture = Resources/enemy.png
 [Enemy]
 

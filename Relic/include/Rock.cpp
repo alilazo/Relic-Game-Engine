@@ -1,3 +1,5 @@
+#ifndef ROCK_H
+#define ROCK_H
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <random>
@@ -24,3 +26,4 @@ public:
         setPosition(x, y);
     }
 };
+#endif

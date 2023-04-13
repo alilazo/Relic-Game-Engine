@@ -411,7 +411,7 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1681190228 source:e:\relic-game-engine\relic\main.cpp
+1681364373 source:e:\relic-game-engine\relic\main.cpp
 	<SFML/Graphics.hpp>
 	<Enemy.cpp>
 	<InputHandler.cpp>
@@ -419,6 +419,14 @@
 	<Rock.cpp>
 	<Health.cpp>
 	<Player.cpp>
+	<fstream>
+	<iostream>
+	<vector>
+	<sstream>
+	<ObjectData.cpp>
+	<Score.cpp>
+	<Gamestate.cpp>
+	<Main_Functions.cpp>
 
 1678250174 e:\relic-game-engine\external tools\sfml-2.5.1\sfml-2.5.1\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -1266,12 +1274,13 @@
 	<string>
 	<Projectile.cpp>
 
-1681190261 e:\relic-game-engine\relic\include\enemy.cpp
+1681364322 e:\relic-game-engine\relic\include\enemy.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<Projectile.cpp>
+	<Player.cpp>
 
-1681188175 e:\relic-game-engine\relic\include\inputhandler.cpp
+1681358060 e:\relic-game-engine\relic\include\inputhandler.cpp
 	<SFML/Graphics.hpp>
 	<cmath>
 	<iostream>
@@ -1288,17 +1297,17 @@
 	<SFML/Graphics.hpp>
 	<cmath>
 
-1681180794 e:\relic-game-engine\relic\include\rock.cpp
+1681358133 e:\relic-game-engine\relic\include\rock.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<random>
 
-1681183093 e:\relic-game-engine\relic\include\health.cpp
+1681358086 e:\relic-game-engine\relic\include\health.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<sstream>
 
-1681189224 e:\relic-game-engine\relic\include\player.cpp
+1681353026 e:\relic-game-engine\relic\include\player.cpp
 	<SFML/Graphics.hpp>
 
 1681225772 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\rock.cpp
@@ -1317,4 +1326,22 @@
 1681324691 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\objectdata.cpp
 
 1681323870 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\score.cpp
+
+1681363569 e:\relic-game-engine\relic\include\objectdata.cpp
+
+1681358104 e:\relic-game-engine\relic\include\score.cpp
+
+1681359490 e:\relic-game-engine\relic\include\gamestate.cpp
+	<Main_Functions.cpp>
+
+1681363443 e:\relic-game-engine\relic\include\main_functions.cpp
+	<vector>
+	<SFML/Graphics.hpp>
+	"ObjectData.cpp"
+	"Player.cpp"
+	"InputHandler.cpp"
+	"Health.cpp"
+	"Score.cpp"
+	"Rock.cpp"
+	"Enemy.cpp"
 

@@ -1,3 +1,5 @@
+#ifndef INPUTHANDLER_H
+#define INPUTHANDLER_H
 #define _USE_MATH_DEFINES
 
 #include <SFML/Graphics.hpp>
@@ -149,3 +151,4 @@ void InputHandler::shoot(){
     projectiles.push_back(projectile);
     std::cout << "Pew";
 }
+#endif

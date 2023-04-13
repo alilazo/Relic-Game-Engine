@@ -1,3 +1,5 @@
+#ifndef HEALTH_H
+#define HEALTH_H
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <sstream>
@@ -65,3 +67,4 @@ public:
         setFont(font);
     }
 };
+#endif // HEALTH_H

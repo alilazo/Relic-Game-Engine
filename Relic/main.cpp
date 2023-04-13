@@ -11,107 +11,11 @@
 #include <sstream>
 #include <ObjectData.cpp>
 #include <Score.cpp>
+#include <Gamestate.cpp>
+#include <Main_Functions.cpp>
 
-//Map Reader implementation
-std::string trim(const std::string& str) {
-    auto first = std::find_if_not(str.begin(), str.end(), [](int c) { return std::isspace(c); });
-    auto last = std::find_if_not(str.rbegin(), str.rend(), [](int c) { return std::isspace(c); }).base();
-    return (first >= last) ? std::string() : std::string(first, last);
-}
 
-std::vector<ObjectData> readMapData(const std::string& filename) {
-    std::vector<ObjectData> objects;
 
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filename << std::endl;
-        return objects;
-    }
-
-    std::string line;
-    std::string currentSection = "";
-    ObjectData currentObject;
-
-    while (std::getline(file, line)) {
-        line = trim(line);
-        if (line.empty() || line[0] == '#') {
-            continue;
-        }
-
-        if (line[0] == '[' && line.back() == ']') {
-            currentSection = line.substr(1, line.size() - 2);
-            continue;
-        }
-
-        std::string key, value;
-        std::istringstream iss(line);
-        if (std::getline(iss, key, '=') && std::getline(iss, value)) {
-            key = trim(key);
-            value = trim(value);
-
-            if (key == "Texture") {
-                currentObject.texture = value;
-            } else if (key == "Position") {
-                std::string::size_type pos = value.find(' ');
-                if (pos != std::string::npos) {
-                    currentObject.posX = std::stof(value.substr(0, pos));
-                    currentObject.posY = std::stof(value.substr(pos + 1));
-                }
-            } else if (key == "Scale") {
-                std::string::size_type pos = value.find(' ');
-                if (pos != std::string::npos) {
-                    currentObject.scaleX = std::stof(value.substr(0, pos));
-                    currentObject.scaleY = std::stof(value.substr(pos + 1));
-                }
-            } else if (key == "Health") {
-                currentObject.health = std::stoi(value);
-                std::cout << currentSection << "  Health: " << currentObject.health << std::endl;
-            } else if (key == "Damage") {
-                currentObject.damage = std::stoi(value);
-                std::cout << currentSection << "  Damage: " << currentObject.damage << std::endl;
-            } else if (key == "Score"){
-                currentObject.score = std::stoi(value);
-                std::cout << currentSection << "  Damage: " << currentObject.score << std::endl;
-            }else{
-                std::cerr << "Invalid key: " << key << std::endl;
-            }
-        } else {
-            std::cerr << "Failed to parse line: " << line << std::endl;
-        }
-
-        if (currentObject.texture != "") {
-            currentObject.type = currentSection;
-            objects.push_back(currentObject);
-            currentObject = ObjectData();
-        }
-    }
-
-    if (currentObject.texture != "") {
-        currentObject.type = currentSection;
-        objects.push_back(currentObject);
-    }
-
-    file.close();
-    return objects;
-}
-
-//Use call by reference instead of value
-void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroundBounds, sf::Vector2f playerPos, float playerRadius) {
-    view.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.0f));
-    // Restrict the view to the visible area of the background sprite
-    if (view.getCenter().x - view.getSize().x / 2 < backgroundBounds.left + playerRadius) {
-        view.setCenter(backgroundBounds.left + view.getSize().x / 2 + playerRadius, view.getCenter().y);
-    }
-    if (view.getCenter().y - view.getSize().y / 2 < backgroundBounds.top + playerRadius) {
-        view.setCenter(view.getCenter().x, backgroundBounds.top + view.getSize().y / 2 + playerRadius);
-    }
-    if (view.getCenter().x + view.getSize().x / 2 > backgroundBounds.left + backgroundBounds.width - playerRadius) {
-        view.setCenter(backgroundBounds.left + backgroundBounds.width - view.getSize().x / 2 - playerRadius, view.getCenter().y);
-    }
-    if (view.getCenter().y + view.getSize().y / 2 > backgroundBounds.top + backgroundBounds.height - playerRadius) {
-        view.setCenter(view.getCenter().x, backgroundBounds.top + backgroundBounds.height - view.getSize().y / 2 - playerRadius);
-    }
-}
 
 int main()
 {
@@ -119,6 +23,8 @@ int main()
     window.setFramerateLimit(60);
 
     //Initialization
+    GameState gamestate;
+    gamestate.nextState(); // Increment Gamestate
     std::vector<ObjectData> objectList = readMapData("Maps/Room1.txt");
     std::vector<Rock> rockList;
     std::vector<Enemy*> enemies;
@@ -128,24 +34,28 @@ int main()
     sf::Texture doorTexture;
     sf::Sprite Key;
     sf::Sprite Door;
+    sf::Sprite Medkit; //TRODO
     sf::Texture keyTexture;
+    sf::Texture medkitTexture;
     keyTexture.loadFromFile("Resources/Key.png");
     Key.setTexture(keyTexture);
+    medkitTexture.loadFromFile("Resources/medkit.png");
+    Medkit.setTexture(medkitTexture);
     enemyTexture.loadFromFile("Resources/enemy.png");
     rockTexture.loadFromFile("Resources/rock.png");
     doorTexture.loadFromFile("Resources/Door.png");
+
     Door.setTexture(doorTexture);
     bool keyDropped = false;
     sf::Vector2f lastEnemyPos;
-
-    Door.setPosition(120.f, 120.f);
+    sf::Vector2f enemyWithMedKitPos;
 
 
     //Displays all the objects captured by readMapData
     std::cout << "Objects: " << objectList.size() << std::endl;
     for(int i = 0; i < objectList.size(); i++){
         std::cout << objectList[i].type << "    -   " << objectList[i].texture << std::endl;
-        std::cout << "PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl << std::endl;
+        std::cout << "PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << "   HasMedkit: " << objectList[i].hasMedKit() << std::endl << std::endl;
     }
 
     //Load the background texture
@@ -153,10 +63,13 @@ int main()
     if(!bgTexture.loadFromFile(objectList[0].texture)){ return EXIT_FAILURE; }
     sf::Sprite bgSprite(bgTexture);
 
-
     //Create the player
     sf::Texture playerTexture;
-    playerTexture.loadFromFile(objectList[1].texture);
+    for(const auto& obj : objectList){
+        if(obj.type.find("Player") != std::string::npos){
+            playerTexture.loadFromFile(obj.texture);
+        }
+    }
     Player player(playerTexture);
 
     player.setScale(objectList[1].scaleX, objectList[1].scaleY);
@@ -184,11 +97,20 @@ int main()
             newEnemy->setHealth(obj.health);
             newEnemy->setDamage(obj.damage);
             newEnemy->setScore(obj.score);
+            newEnemy->setHasMedkit(obj.medkit);
             Enemy::remainingEnemies++;
             std::cout << "Spawned: " << Enemy::remainingEnemies << std::endl;
-            std::cout << "Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << std::endl;
+            std::cout << "Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << "  HasMedkit: " << newEnemy->hasMedkit() << std::endl;
             std::cout << "Enemy ScaleX: " << newEnemy->getScale().x << "  ScaleY: " << newEnemy->getScale().y << std::endl;
             enemies.push_back(newEnemy);
+        }
+    }
+
+    //Create the Door
+    for(const auto& obj : objectList){
+        if(obj.type.find("Door") != std::string::npos) {
+            Door.setPosition(obj.posX, obj.posY);
+            Door.setScale(obj.scaleX, obj.scaleY);
         }
     }
 
@@ -239,8 +161,10 @@ int main()
             }
 
             //Setting the options for the user input
-            gameInput.setMovementHandler("keyboard", event, fixedTimeStep);
-            gameInput.setPlayerPositionToMouse(window);
+            if(player.getHealth() > 0){
+                gameInput.setMovementHandler("keyboard", event, fixedTimeStep);
+                gameInput.setPlayerPositionToMouse(window);
+            }
 
             sf::Vector2f playerPos = player.getPosition();
 
@@ -287,6 +211,9 @@ int main()
             if(currentEnemy && currentEnemy->getHealth() > 0){
                 window.draw(*currentEnemy);
                 lastEnemyPos = currentEnemy->getPosition();
+                if(currentEnemy->hasMedkit()){
+                    enemyWithMedKitPos = currentEnemy->getPosition();
+                }
                 //Calculate distance between player and enemy
                 sf::Vector2f playerPos = player.getPosition();
                 sf::Vector2f enemyPos = currentEnemy->getPosition();
@@ -366,9 +293,28 @@ int main()
             window.draw(Key);
         }
 
+        //Put down a medkit
+        if(Enemy::hasMedKitToDrop){
+            Medkit.setPosition(enemyWithMedKitPos);
+            window.draw(Medkit);
+        }
+
         //Player Collision for key
         if(player.collidesWith(Key)){
             player.setKey(true);
+        }
+
+        //Player Picks up medkit
+        if(player.collidesWith(Medkit)){
+            player.setHealth(100);
+        }
+
+        //Player collision with door for next level
+        if(player.hasKey() && player.collidesWith(Door) && Enemy::remainingEnemies <= 0){
+            gamestate.nextState();
+            std::string nextMapFileName = "Maps/Room" + std::to_string(gamestate.getState()) + ".txt";
+            std::cout << "Loading Map: " << nextMapFileName << std::endl;
+            gamestate.loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, Door, Key, bgTexture, doorTexture, keyTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, nextMapFileName);
         }
 
 
