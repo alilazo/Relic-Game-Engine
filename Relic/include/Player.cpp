@@ -7,7 +7,10 @@ class Player : public sf::Sprite {
 private:
     int health;
     int score = 0;
+    bool possesKey = false;
 public:
+    bool hasKey(){ return possesKey; }
+    void setKey(bool doesPlayerHaveKey) { possesKey = doesPlayerHaveKey; }
     bool isAlive = health > 0;
     Player(sf::Texture& texture) {
         setTexture(texture);

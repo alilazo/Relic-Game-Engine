@@ -6,6 +6,7 @@
 class Enemy : public sf::Sprite{
 public:
     Enemy(sf::Texture&);
+    static int remainingEnemies;
     void setX(float);
     void setY(float);
     void setPosition(float x, float y);
@@ -20,14 +21,23 @@ public:
     bool collidesWith(const sf::Sprite& other) const {
         return getGlobalBounds().intersects(other.getGlobalBounds());
     }
+    bool getIsDead() { return isDead; }
+    void setIsDead(bool dead) { isDead = dead; }
 
     void handleCollision(Projectile& projectile, Player& player) {
         if (collidesWith(projectile.getSprite())) {
             health -= projectile.getDamage();
             if (health <= 0) {
-                std::cout << "(Enemy.cpp) Enemy died" << std::endl;
+                std::cout << "(Enemy.cpp) Enemy died " << std::endl;
+                std::cout << "(Enemy.cpp) Enemies remaining:  " << remainingEnemies << std::endl;
                 setDamage(0);
                 player.setScore(player.getScore() + getScore());
+                remainingEnemies--;
+                //lastEnemyPos = getPosition();
+                if(remainingEnemies == 0){
+                    std::cout << "(Enemy.cpp) Last enemy killed, dropping key" << std::endl;
+
+                }
             }
         }
     }
@@ -42,7 +52,6 @@ private:
 
 Enemy::Enemy(sf::Texture &enemyTexture){
     this->setTexture(enemyTexture);
-    //this->damage = 25;
 }
 
 void Enemy::setPosition(float xPos, float yPos){
@@ -59,3 +68,5 @@ void Enemy::setX(float xPos){
 void Enemy::setY(float yPos){
     y = yPos;
 }
+
+int Enemy::remainingEnemies = 0;

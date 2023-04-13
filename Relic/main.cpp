@@ -125,8 +125,20 @@ int main()
     sf::Clock playerCollisionClock;
     sf::Texture rockTexture;
     sf::Texture enemyTexture;
+    sf::Texture doorTexture;
+    sf::Sprite Key;
+    sf::Sprite Door;
+    sf::Texture keyTexture;
+    keyTexture.loadFromFile("Resources/Key.png");
+    Key.setTexture(keyTexture);
     enemyTexture.loadFromFile("Resources/enemy.png");
     rockTexture.loadFromFile("Resources/rock.png");
+    doorTexture.loadFromFile("Resources/Door.png");
+    Door.setTexture(doorTexture);
+    bool keyDropped = false;
+    sf::Vector2f lastEnemyPos;
+
+    Door.setPosition(120.f, 120.f);
 
 
     //Displays all the objects captured by readMapData
@@ -172,6 +184,8 @@ int main()
             newEnemy->setHealth(obj.health);
             newEnemy->setDamage(obj.damage);
             newEnemy->setScore(obj.score);
+            Enemy::remainingEnemies++;
+            std::cout << "Spawned: " << Enemy::remainingEnemies << std::endl;
             std::cout << "Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << std::endl;
             std::cout << "Enemy ScaleX: " << newEnemy->getScale().x << "  ScaleY: " << newEnemy->getScale().y << std::endl;
             enemies.push_back(newEnemy);
@@ -251,6 +265,8 @@ int main()
             accumulator -= fixedTimeStep;
         }
 
+
+
         score.setScore(player.getScore());
 
         window.setView(view);
@@ -270,7 +286,7 @@ int main()
             Enemy* currentEnemy = *itEnemy;
             if(currentEnemy && currentEnemy->getHealth() > 0){
                 window.draw(*currentEnemy);
-
+                lastEnemyPos = currentEnemy->getPosition();
                 //Calculate distance between player and enemy
                 sf::Vector2f playerPos = player.getPosition();
                 sf::Vector2f enemyPos = currentEnemy->getPosition();
@@ -285,7 +301,7 @@ int main()
             }
 
             //Check for player collision with enemy
-            if (player.collidesWith(*currentEnemy) && player.isAlive) {
+            if (player.collidesWith(*currentEnemy) && player.getHealth() > 0) {
                 if(player.getHealth() <= 0) {
                     player.isAlive = false;
                     player.setHealth(0);
@@ -297,10 +313,10 @@ int main()
                             playerHealth.setHealth(0);
                             player.setHealth(0);
                         } else {
-                        player.setHealth(player.getHealth() - damage);
-                        std::cout << "Player health: " << player.getHealth() << std::endl;
-                        playerHealth.decreaseHealth(damage);
-                        playerCollisionClock.restart();
+                            player.setHealth(player.getHealth() - damage);
+                            std::cout << "Player health: " << player.getHealth() << std::endl;
+                            playerHealth.decreaseHealth(damage);
+                            playerCollisionClock.restart();
                         }
                     }
                 }
@@ -321,9 +337,8 @@ int main()
                 }
 
                 //Projectile Collision
-                if (itProjectile->getSprite().getGlobalBounds().intersects(currentEnemy->getGlobalBounds()) && currentEnemy->getHealth() >= 0 || intersectsRock)
+                if (itProjectile->getSprite().getGlobalBounds().intersects(currentEnemy->getGlobalBounds()) && currentEnemy->getHealth() > 0 || intersectsRock)
                 {
-
                     if(currentEnemy->getHealth() >= 0 && currentEnemy->collidesWith(itProjectile->getSprite())) {
                             std::cout << "\nHit, Enemy health is: " <<  currentEnemy->getHealth() << std::endl;
                             currentEnemy->handleCollision(*itProjectile, player);
@@ -332,18 +347,30 @@ int main()
                     continue;
                 }
 
-
                 window.draw(itProjectile->getSprite());
                 ++itProjectile;
             }
         }
 
         window.draw(player);
+        window.draw(Door);
 
         window.setView(fixedViewPlayerHealthScore);
         window.draw(score);
         window.draw(playerHealth);
         window.setView(view);
+
+        //Draw the key on the last position of the enemy when it dies.
+        if(Enemy::remainingEnemies <= 0 && !player.hasKey()){
+            Key.setPosition(lastEnemyPos);
+            window.draw(Key);
+        }
+
+        //Player Collision for key
+        if(player.collidesWith(Key)){
+            player.setKey(true);
+        }
+
 
         window.display();
     }

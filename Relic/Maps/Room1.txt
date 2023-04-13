@@ -31,7 +31,7 @@ Health = 100
 Damage = 25
 Scale = 0.3 0.3
 Score = 10
-Texture = Resources/enemy.png
+Texture = Resources/rock.png
 [Enemy]
 
 [Enemy]
