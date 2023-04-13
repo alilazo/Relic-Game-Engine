@@ -76,9 +76,6 @@ std::vector<ObjectData> readMapData(const std::string& filename) {
             } else if (key == "Score"){
                 currentObject.score = std::stoi(value);
                 std::cout << currentSection << "  SCore: " << currentObject.score << std::endl;
-            }else if (key == "Medkit"){
-                currentObject.medkit = value;
-                std::cout << currentSection << "  Medkit: " << currentObject.medkit << std::endl;
             }else{
                 std::cerr << "Invalid key: " << key << std::endl;
             }

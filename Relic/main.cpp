@@ -44,7 +44,6 @@ int main()
     enemyTexture.loadFromFile("Resources/enemy.png");
     rockTexture.loadFromFile("Resources/rock.png");
     doorTexture.loadFromFile("Resources/Door.png");
-
     Door.setTexture(doorTexture);
     bool keyDropped = false;
     sf::Vector2f lastEnemyPos;
@@ -55,7 +54,7 @@ int main()
     std::cout << "Objects: " << objectList.size() << std::endl;
     for(int i = 0; i < objectList.size(); i++){
         std::cout << objectList[i].type << "    -   " << objectList[i].texture << std::endl;
-        std::cout << "PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << "   HasMedkit: " << objectList[i].hasMedKit() << std::endl << std::endl;
+        std::cout << "PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl << std::endl;
     }
 
     //Load the background texture
@@ -97,7 +96,6 @@ int main()
             newEnemy->setHealth(obj.health);
             newEnemy->setDamage(obj.damage);
             newEnemy->setScore(obj.score);
-            newEnemy->setHasMedkit(obj.medkit);
             Enemy::remainingEnemies++;
             std::cout << "Spawned: " << Enemy::remainingEnemies << std::endl;
             std::cout << "Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << "  HasMedkit: " << newEnemy->hasMedkit() << std::endl;
@@ -293,20 +291,9 @@ int main()
             window.draw(Key);
         }
 
-        //Put down a medkit
-        if(Enemy::hasMedKitToDrop){
-            Medkit.setPosition(enemyWithMedKitPos);
-            window.draw(Medkit);
-        }
-
         //Player Collision for key
         if(player.collidesWith(Key)){
             player.setKey(true);
-        }
-
-        //Player Picks up medkit
-        if(player.collidesWith(Medkit)){
-            player.setHealth(100);
         }
 
         //Player collision with door for next level
@@ -315,6 +302,29 @@ int main()
             std::string nextMapFileName = "Maps/Room" + std::to_string(gamestate.getState()) + ".txt";
             std::cout << "Loading Map: " << nextMapFileName << std::endl;
             gamestate.loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, Door, Key, bgTexture, doorTexture, keyTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, nextMapFileName);
+        }
+
+
+        if(player.getHealth() <= 0){
+            sf::RectangleShape overlay(sf::Vector2f(window.getSize()));
+            overlay.setFillColor(sf::Color(255, 0, 0, 100)); // Set the alpha value to 100 to create a semi-transparent effect
+
+            // Create the "You Died" text
+            sf::Font font;
+            if (!font.loadFromFile("Resources/Fonts/Zomboid.ttf")) {
+                // Handle font loading error
+            }
+            sf::Text youDiedText("You Died", font, 72);
+            youDiedText.setPosition(window.getSize().x / 2 - youDiedText.getGlobalBounds().width / 2, window.getSize().y / 2 - youDiedText.getGlobalBounds().height / 2);
+
+            std::ostringstream ss;
+            ss << "Score: " << score.getScore();
+            sf::Text scoreText(ss.str(), font, 30);
+            scoreText.setPosition(window.getSize().x / 2 - scoreText.getLocalBounds().width / 2, window.getSize().y / 2 + 50);
+            // Draw the "You Died" screen
+            window.draw(overlay);
+            window.draw(youDiedText);
+            window.draw(scoreText);
         }
 
 

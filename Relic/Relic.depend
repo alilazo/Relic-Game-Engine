@@ -837,7 +837,7 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1681347756 source:c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\main.cpp
+1681422383 source:c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\main.cpp
 	<SFML/Graphics.hpp>
 	<Enemy.cpp>
 	<InputHandler.cpp>
@@ -851,6 +851,8 @@
 	<sstream>
 	<ObjectData.cpp>
 	<Score.cpp>
+	<Gamestate.cpp>
+	<Main_Functions.cpp>
 
 1677543674 c:\users\lazoa\desktop\relic engine\relic-game-engine\external tools\sfml-2.5.1\sfml-2.5.1\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -1261,13 +1263,13 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1681346863 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\enemy.cpp
+1681416777 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\enemy.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<Projectile.cpp>
 	<Player.cpp>
 
-1681343694 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\inputhandler.cpp
+1681416777 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\inputhandler.cpp
 	<SFML/Graphics.hpp>
 	<cmath>
 	<iostream>
@@ -1310,22 +1312,22 @@
 1681353026 e:\relic-game-engine\relic\include\player.cpp
 	<SFML/Graphics.hpp>
 
-1681225772 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\rock.cpp
+1681416777 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\rock.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<random>
 
-1681225772 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\health.cpp
+1681416777 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\health.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<sstream>
 
-1681347353 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\player.cpp
+1681421177 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\player.cpp
 	<SFML/Graphics.hpp>
 
-1681324691 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\objectdata.cpp
+1681421220 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\objectdata.cpp
 
-1681323870 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\score.cpp
+1681416777 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\score.cpp
 
 1681363569 e:\relic-game-engine\relic\include\objectdata.cpp
 
@@ -1335,6 +1337,20 @@
 	<Main_Functions.cpp>
 
 1681363443 e:\relic-game-engine\relic\include\main_functions.cpp
+	<vector>
+	<SFML/Graphics.hpp>
+	"ObjectData.cpp"
+	"Player.cpp"
+	"InputHandler.cpp"
+	"Health.cpp"
+	"Score.cpp"
+	"Rock.cpp"
+	"Enemy.cpp"
+
+1681421195 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\gamestate.cpp
+	<Main_Functions.cpp>
+
+1681421166 c:\users\lazoa\desktop\relic engine\relic-game-engine\relic\include\main_functions.cpp
 	<vector>
 	<SFML/Graphics.hpp>
 	"ObjectData.cpp"
