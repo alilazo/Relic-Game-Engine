@@ -18,12 +18,6 @@ Scale = 0.3 0.3
 Texture = Resources/Door.png
 [Door]
 
-[Key]
-Position = 0.0 0.0
-Scale = 0.3 0.3
-Texture = Resources/Key.png
-[Key]
-
 [Rock1]
 Position = 240 250
 Scale = 0.1 0.1
@@ -42,7 +36,6 @@ Health = 100
 Damage = 25
 Scale = 0.3 0.3
 Score = 10
-Medkit = true
 Texture = Resources/enemy.png
 [Enemy]
 

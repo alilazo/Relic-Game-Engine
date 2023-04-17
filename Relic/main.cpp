@@ -54,7 +54,7 @@ int main()
     std::cout << "Objects: " << objectList.size() << std::endl;
     for(int i = 0; i < objectList.size(); i++){
         std::cout << objectList[i].type << "    -   " << objectList[i].texture << std::endl;
-        std::cout << "PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl << std::endl;
+        std::cout << "(main.cpp) PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl << std::endl;
     }
 
     //Load the background texture
@@ -97,9 +97,9 @@ int main()
             newEnemy->setDamage(obj.damage);
             newEnemy->setScore(obj.score);
             Enemy::remainingEnemies++;
-            std::cout << "Spawned: " << Enemy::remainingEnemies << std::endl;
-            std::cout << "Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << "  HasMedkit: " << newEnemy->hasMedkit() << std::endl;
-            std::cout << "Enemy ScaleX: " << newEnemy->getScale().x << "  ScaleY: " << newEnemy->getScale().y << std::endl;
+            std::cout << "(main.cpp) Spawned: " << Enemy::remainingEnemies << std::endl;
+            std::cout << "(main.cpp) Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << "  HasMedkit: " << newEnemy->hasMedkit() << std::endl;
+            std::cout << "(main.cpp) Enemy ScaleX: " << newEnemy->getScale().x << "  ScaleY: " << newEnemy->getScale().y << std::endl;
             enemies.push_back(newEnemy);
         }
     }
@@ -136,7 +136,7 @@ int main()
     sf::View fixedViewPlayerHealthScore(sf::FloatRect(0.f, 0.f, window.getSize().x/4.f, window.getSize().y/4.f));
     fixedViewPlayerHealthScore.setViewport(sf::FloatRect(0.f, 0.f, 0.4f, 0.4f));
 
-    std::cout << "Finished init." << std::endl;
+    std::cout << "(main.cpp) Finished init." << std::endl;
 
     //Fixed time step system
     sf::Clock clock;
@@ -239,7 +239,7 @@ int main()
                             player.setHealth(0);
                         } else {
                             player.setHealth(player.getHealth() - damage);
-                            std::cout << "Player health: " << player.getHealth() << std::endl;
+                            std::cout << "(main.cpp) Player health: " << player.getHealth() << std::endl;
                             playerHealth.decreaseHealth(damage);
                             playerCollisionClock.restart();
                         }
@@ -265,7 +265,7 @@ int main()
                 if (itProjectile->getSprite().getGlobalBounds().intersects(currentEnemy->getGlobalBounds()) && currentEnemy->getHealth() > 0 || intersectsRock)
                 {
                     if(currentEnemy->getHealth() >= 0 && currentEnemy->collidesWith(itProjectile->getSprite())) {
-                            std::cout << "\nHit, Enemy health is: " <<  currentEnemy->getHealth() << std::endl;
+                            std::cout << "\n(main.cpp) Hit, Enemy health is: " <<  currentEnemy->getHealth() << std::endl;
                             currentEnemy->handleCollision(*itProjectile, player);
                     }
                     itProjectile = gameInput.getProjectiles().erase(itProjectile);
@@ -300,7 +300,7 @@ int main()
         if(player.hasKey() && player.collidesWith(Door) && Enemy::remainingEnemies <= 0){
             gamestate.nextState();
             std::string nextMapFileName = "Maps/Room" + std::to_string(gamestate.getState()) + ".txt";
-            std::cout << "Loading Map: " << nextMapFileName << std::endl;
+            std::cout << "(main.cpp) Loading Map: " << nextMapFileName << std::endl;
             gamestate.loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, Door, Key, bgTexture, doorTexture, keyTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, nextMapFileName);
         }
 
