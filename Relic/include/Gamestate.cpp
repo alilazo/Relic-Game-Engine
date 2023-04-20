@@ -12,10 +12,14 @@ public:
         state++;
     }
 
-void loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Sprite& Door, sf::Sprite& Key, sf::Texture& bgTexture, sf::Texture& doorTexture, sf::Texture& keyTexture, sf::Texture& rockTexture, sf::Texture& enemyTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window, const std::string& mapFileName)
+bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture,  sf::Texture& rockTexture, sf::Texture& enemyTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window, const std::string& mapFileName)
 {
     // Load the new map data
     objectList = readMapData(mapFileName);
+
+    if (objectList.empty()) {
+        return false;
+    }
 
     // Clear out the old rocks and enemies and reseting remainingEnemies
     rockList.clear();
@@ -26,7 +30,7 @@ void loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockLis
     Enemy::remainingEnemies = 0;
 
     // Load the new background texture and sprite
-    if (!bgTexture.loadFromFile(objectList[0].texture)) { return; }
+    if (!bgTexture.loadFromFile(objectList[0].texture)) { return false; }
     bgSprite.setTexture(bgTexture);
 
     // Create new rocks and enemies based on the map data
@@ -48,13 +52,6 @@ void loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockLis
             enemies.push_back(newEnemy);
         }
     }
-
-    // Load the new door and key textures and sprites
-    doorTexture.loadFromFile("Resources/Door.png");
-    Door.setTexture(doorTexture);
-    keyTexture.loadFromFile("Resources/Key.png");
-    Key.setTexture(keyTexture);
-
     // Set up the new player position, health, score, and input handler
     player.setPosition(objectList[1].posX, objectList[1].posY);
     player.setScale(objectList[1].scaleX, objectList[1].scaleY);
@@ -72,7 +69,78 @@ void loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockLis
     // Reset the remaining enemies and key dropped flags
     KeyDropped = false;
     player.setKey(false);
+    std::cout << "(Gamestate.cpp) State: " << getState() << std::endl;
+
+    return true;
 }
+
+void displayEndScreen(bool& endGame, bool& restartButtonIsPressed, std::vector<ObjectData>& objectList, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, sf::Texture& rockTexture, sf::Texture& enemyTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window) {
+    sf::Font font;
+    if (!font.loadFromFile("Resources/Fonts/Zomboid.ttf")) {
+        std::cerr << "Error loading font file." << std::endl;
+        return;
+    }
+
+    sf::Text text;
+    text.setFont(font);
+    text.setString("END");
+    text.setCharacterSize(50);
+    text.setFillColor(sf::Color::White);
+    text.setStyle(sf::Text::Bold);
+
+    sf::FloatRect textRect = text.getLocalBounds();
+    text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+    text.setPosition(sf::Vector2f(window.getSize().x / 2.0f, window.getSize().y / 2.0f));
+
+    sf::RectangleShape background(sf::Vector2f(window.getSize().x, window.getSize().y));
+    background.setFillColor(sf::Color(0, 0, 0, 200));
+
+    std::ostringstream ss;
+    ss << "Score: " << score.getScore();
+    sf::Text scoreText(ss.str(), font, 30);
+    scoreText.setPosition(window.getSize().x / 2 - scoreText.getLocalBounds().width / 2, window.getSize().y / 2 + 20);
+
+    sf::Text restartText("Restart Game", font, 50);
+    restartText.setFillColor(sf::Color::White);
+    restartText.setPosition(window.getSize().x / 2 - restartText.getLocalBounds().width / 2, window.getSize().y / 2 + 50);
+
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            if (restartText.getGlobalBounds().contains(mousePosition)) {
+                restartButtonIsPressed = true;
+            }
+        }
+
+        //Restart button pressed
+        if (restartButtonIsPressed) {
+            restartButtonIsPressed = false;
+            player.setHealth(100);
+            playerHealth.setHealth(100);
+            player.setScore(0);
+            score.setScore(0);
+            KeyDropped = false;
+            player.setKey(false);
+            std::cout << "(Gamestate.cpp) Restarting Game..." << std::endl;
+            setState(1);
+            endGame = false;
+            loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, bgTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
+        }
+
+
+        window.clear();
+        window.draw(background);
+        window.draw(text);
+        window.draw(scoreText);
+        window.draw(restartText);
+
+    std::cout << "(Gamestate.cpp) END" << std::endl;
+}
+
+void setState(int gs){
+    state = gs;
+    std::cout << "(Gamestate.cpp) State: " << getState() << std::endl;
+}
+
 
 private:
     int state;

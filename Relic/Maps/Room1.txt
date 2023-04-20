@@ -31,7 +31,7 @@ Texture = Resources/rock.png
 [Rock2]
 
 [Enemy]
-Position = 220 120
+Position = 270 180
 Health = 100
 Damage = 25
 Scale = 0.3 0.3

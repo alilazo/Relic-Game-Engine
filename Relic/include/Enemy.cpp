@@ -9,7 +9,6 @@ class Enemy : public sf::Sprite{
 public:
     Enemy(sf::Texture&);
     static int remainingEnemies;
-    static bool hasMedKitToDrop;
     void setX(float);
     void setY(float);
     void setPosition(float x, float y);
@@ -21,8 +20,6 @@ public:
     void setDamage(int dmg) { damage = dmg; }
     void setScore(int newScore) { score = newScore; }
     int getScore() const { return score; }
-    void setHasMedkit(std::string hasMed) {if(hasMed == "true") medkit = true; else medkit = false;}
-    bool hasMedkit(){return medkit;}
     bool collidesWith(const sf::Sprite& other) const {
         return getGlobalBounds().intersects(other.getGlobalBounds());
     }
@@ -42,9 +39,6 @@ public:
                 if(remainingEnemies == 0){
                     std::cout << "(Enemy.cpp) Last enemy killed, dropping key" << std::endl;
                 }
-                if(hasMedkit()){
-                    hasMedKitToDrop = true;
-                }
             }
         }
     }
@@ -53,7 +47,6 @@ private:
     float y;
     int health;
     int damage;
-    bool medkit;
     bool isDead = health <= 0;
     int score;
 };
@@ -78,5 +71,4 @@ void Enemy::setY(float yPos){
 }
 
 int Enemy::remainingEnemies = 0;
-bool Enemy::hasMedKitToDrop = false;
 #endif

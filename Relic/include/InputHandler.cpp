@@ -48,41 +48,41 @@ void InputHandler::setMovementHandler(std::string setting, sf::Event event, floa
     movementSpeed *= deltaTime;
 
     if (setting == "arrows") {
-        if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Right)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
             rightKeyPressed = true;
         }
-        else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Right)
+        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
             rightKeyPressed = false;
         }
-        else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Down)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
             downKeyPressed = true;
         }
-        else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Down)
+        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
             downKeyPressed = false;
         }
-        else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Left)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
             leftKeyPressed = true;
         }
-        else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Left)
+        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
             leftKeyPressed = false;
         }
-        else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Up)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
             upKeyPressed = true;
         }
-        else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Up)
+        else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
             upKeyPressed = false;
         }
-        else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::P)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
         {
-            std::cout << "Player Debug: X: " << player->getPosition().x << " Y: " << player->getPosition().y << std::endl;
+            std::cout << "(InputHandler.cpp) Player Debug: X: " << player->getPosition().x << " Y: " << player->getPosition().y << std::endl;
         }
     } else if (setting == "keyboard"){
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
@@ -119,7 +119,7 @@ void InputHandler::setMovementHandler(std::string setting, sf::Event event, floa
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
         {
-            std::cout << "Player Debug: X: " << player->getPosition().x << " Y: " << player->getPosition().y << std::endl;
+            std::cout << "(InputHandler.cpp) Player Debug: X: " << player->getPosition().x << " Y: " << player->getPosition().y << std::endl;
         }
     }
     if (rightKeyPressed) {
@@ -149,6 +149,5 @@ void InputHandler::shoot(){
     float playerAngle = player->getRotation();
     Projectile projectile(projectileTexture, 600.f, playerPos, playerAngle, 25);
     projectiles.push_back(projectile);
-    std::cout << "Pew";
 }
 #endif

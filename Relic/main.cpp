@@ -46,15 +46,16 @@ int main()
     doorTexture.loadFromFile("Resources/Door.png");
     Door.setTexture(doorTexture);
     bool keyDropped = false;
+    bool restartButtonIsPressed = false;
+    bool endGame = false;
     sf::Vector2f lastEnemyPos;
-    sf::Vector2f enemyWithMedKitPos;
 
 
     //Displays all the objects captured by readMapData
-    std::cout << "Objects: " << objectList.size() << std::endl;
+    std::cout << "(main.cpp) Objects: " << objectList.size() << std::endl;
     for(int i = 0; i < objectList.size(); i++){
-        std::cout << objectList[i].type << "    -   " << objectList[i].texture << std::endl;
-        std::cout << "(main.cpp) PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl << std::endl;
+        std::cout << "(main.cpp) " << objectList[i].type << "    -   " << objectList[i].texture << std::endl;
+        std::cout << "(main.cpp) PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl;
     }
 
     //Load the background texture
@@ -98,7 +99,7 @@ int main()
             newEnemy->setScore(obj.score);
             Enemy::remainingEnemies++;
             std::cout << "(main.cpp) Spawned: " << Enemy::remainingEnemies << std::endl;
-            std::cout << "(main.cpp) Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << "  HasMedkit: " << newEnemy->hasMedkit() << std::endl;
+            std::cout << "(main.cpp) Enemy Health: " << newEnemy->getHealth() << "  DMG: " << newEnemy->getDamage() << "  Score: " << newEnemy->getScore() << std::endl;
             std::cout << "(main.cpp) Enemy ScaleX: " << newEnemy->getScale().x << "  ScaleY: " << newEnemy->getScale().y << std::endl;
             enemies.push_back(newEnemy);
         }
@@ -140,7 +141,6 @@ int main()
 
     //Fixed time step system
     sf::Clock clock;
-
     const float fixedTimeStep = 1.0f / 60.0f;
     float accumulator = 0.0f;
 
@@ -159,7 +159,7 @@ int main()
             }
 
             //Setting the options for the user input
-            if(player.getHealth() > 0){
+            if(player.getHealth() > 0 && !endGame){
                 gameInput.setMovementHandler("keyboard", event, fixedTimeStep);
                 gameInput.setPlayerPositionToMouse(window);
             }
@@ -187,14 +187,10 @@ int main()
             accumulator -= fixedTimeStep;
         }
 
-
-
         score.setScore(player.getScore());
 
         window.setView(view);
-
         window.clear();
-
         window.draw(bgSprite);
 
         //Draws each rock in the vector.
@@ -209,9 +205,6 @@ int main()
             if(currentEnemy && currentEnemy->getHealth() > 0){
                 window.draw(*currentEnemy);
                 lastEnemyPos = currentEnemy->getPosition();
-                if(currentEnemy->hasMedkit()){
-                    enemyWithMedKitPos = currentEnemy->getPosition();
-                }
                 //Calculate distance between player and enemy
                 sf::Vector2f playerPos = player.getPosition();
                 sf::Vector2f enemyPos = currentEnemy->getPosition();
@@ -221,7 +214,9 @@ int main()
                 if(distance <= 600) {
                     float angle = std::atan2(playerPos.y - enemyPos.y, playerPos.x - enemyPos.x);
                     currentEnemy->setRotation(angle * 180 / M_PI);
-                    currentEnemy->move(std::cos(angle) * 50.0f * deltaTime, std::sin(angle) * 50.0f * deltaTime);
+                    if(player.getHealth() > 0 ){
+                        currentEnemy->move(std::cos(angle) * 50.0f * deltaTime, std::sin(angle) * 50.0f * deltaTime);
+                    }
                 }
             }
 
@@ -247,6 +242,7 @@ int main()
                 }
             }
 
+            //Projectile System
             for (auto itProjectile = gameInput.getProjectiles().begin(); itProjectile != gameInput.getProjectiles().end(); )
             {
                 itProjectile->update(deltaTime);
@@ -265,8 +261,8 @@ int main()
                 if (itProjectile->getSprite().getGlobalBounds().intersects(currentEnemy->getGlobalBounds()) && currentEnemy->getHealth() > 0 || intersectsRock)
                 {
                     if(currentEnemy->getHealth() >= 0 && currentEnemy->collidesWith(itProjectile->getSprite())) {
-                            std::cout << "\n(main.cpp) Hit, Enemy health is: " <<  currentEnemy->getHealth() << std::endl;
-                            currentEnemy->handleCollision(*itProjectile, player);
+                        std::cout << "(main.cpp) Hit, Enemy health is: " <<  currentEnemy->getHealth() << std::endl;
+                        currentEnemy->handleCollision(*itProjectile, player);
                     }
                     itProjectile = gameInput.getProjectiles().erase(itProjectile);
                     continue;
@@ -301,32 +297,59 @@ int main()
             gamestate.nextState();
             std::string nextMapFileName = "Maps/Room" + std::to_string(gamestate.getState()) + ".txt";
             std::cout << "(main.cpp) Loading Map: " << nextMapFileName << std::endl;
-            gamestate.loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, Door, Key, bgTexture, doorTexture, keyTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, nextMapFileName);
+            if(!gamestate.loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, bgTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, nextMapFileName)){
+                endGame = true;
+                gamestate.displayEndScreen(endGame, restartButtonIsPressed, objectList, rockList, enemies, projectileTexture, bgSprite, bgTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window);
+            }
         }
 
-
+        //Display Player died when they die
         if(player.getHealth() <= 0){
             sf::RectangleShape overlay(sf::Vector2f(window.getSize()));
             overlay.setFillColor(sf::Color(255, 0, 0, 100)); // Set the alpha value to 100 to create a semi-transparent effect
 
             // Create the "You Died" text
             sf::Font font;
-            if (!font.loadFromFile("Resources/Fonts/Zomboid.ttf")) {
-                // Handle font loading error
-            }
+            if (!font.loadFromFile("Resources/Fonts/Zomboid.ttf")) { return EXIT_FAILURE; }
             sf::Text youDiedText("You Died", font, 72);
-            youDiedText.setPosition(window.getSize().x / 2 - youDiedText.getGlobalBounds().width / 2, window.getSize().y / 2 - youDiedText.getGlobalBounds().height / 2);
+            youDiedText.setPosition(window.getSize().x / 2 - youDiedText.getGlobalBounds().width / 2, window.getSize().y / 2 - youDiedText.getGlobalBounds().height / 2 - 30);
 
             std::ostringstream ss;
             ss << "Score: " << score.getScore();
             sf::Text scoreText(ss.str(), font, 30);
-            scoreText.setPosition(window.getSize().x / 2 - scoreText.getLocalBounds().width / 2, window.getSize().y / 2 + 50);
+            scoreText.setPosition(window.getSize().x / 2 - scoreText.getLocalBounds().width / 2, window.getSize().y / 2 + 20);
+
+            sf::Text restartText("Restart Game", font, 50);
+            restartText.setFillColor(sf::Color::White);
+            restartText.setPosition(window.getSize().x / 2 - restartText.getLocalBounds().width / 2, window.getSize().y / 2 + 50);
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+                if (restartText.getGlobalBounds().contains(mousePosition)) {
+                    restartButtonIsPressed = true;
+                }
+            }
+
+            //Restart button pressed
+            if (restartButtonIsPressed) {
+                restartButtonIsPressed = false;
+                player.setHealth(100);
+                playerHealth.setHealth(100);
+                player.setScore(0);
+                score.setScore(0);
+                KeyDropped = false;
+                player.setKey(false);
+                std::cout << "(Main.cpp) Restarting Game..." << std::endl;
+                gamestate.setState(1);
+                gamestate.loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, bgTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
+            }
+
             // Draw the "You Died" screen
             window.draw(overlay);
             window.draw(youDiedText);
             window.draw(scoreText);
+            window.draw(restartText);
         }
-
 
         window.display();
     }

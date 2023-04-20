@@ -69,18 +69,18 @@ std::vector<ObjectData> readMapData(const std::string& filename) {
                 }
             } else if (key == "Health") {
                 currentObject.health = std::stoi(value);
-                std::cout << currentSection << "  Health: " << currentObject.health << std::endl;
+                std::cout << "(Main_Functions.cpp) " << currentSection << "  Health: " << currentObject.health << std::endl;
             } else if (key == "Damage") {
                 currentObject.damage = std::stoi(value);
-                std::cout << currentSection << "  Damage: " << currentObject.damage << std::endl;
+                std::cout << "(Main_Functions.cpp) " << currentSection << "  Damage: " << currentObject.damage << std::endl;
             } else if (key == "Score"){
                 currentObject.score = std::stoi(value);
-                std::cout << currentSection << "  SCore: " << currentObject.score << std::endl;
+                std::cout << "(Main_Functions.cpp) " << currentSection << "  Score: " << currentObject.score << std::endl;
             }else{
-                std::cerr << "Invalid key: " << key << std::endl;
+                std::cerr << "(Main_Functions.cpp) Invalid key: " << key << std::endl;
             }
         } else {
-            std::cerr << "Failed to parse line: " << line << std::endl;
+            std::cerr << "(Main_Functions.cpp) Failed to parse line: " << line << std::endl;
         }
     }
 
@@ -110,5 +110,4 @@ void initView(sf::View& view, sf::FloatRect visibleArea, sf::FloatRect backgroun
         view.setCenter(view.getCenter().x, backgroundBounds.top + backgroundBounds.height - view.getSize().y / 2 - playerRadius);
     }
 }bool KeyDropped;
-
 #endif
