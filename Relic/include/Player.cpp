@@ -10,7 +10,7 @@ private:
     bool possesKey = false;
 public:
     bool hasKey(){ return possesKey; }
-    void setKey(bool doesPlayerHaveKey) { possesKey = doesPlayerHaveKey; }
+    void setKey(bool doesPlayerHaveKey) { possesKey = doesPlayerHaveKey;}
     bool isAlive = health > 0;
     Player(sf::Texture& texture) {
         setTexture(texture);

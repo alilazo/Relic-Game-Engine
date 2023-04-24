@@ -84,7 +84,7 @@ std::vector<ObjectData> readMapData(const std::string& filename) {
         }
     }
 
-    if (currentObject.texture != "") {
+    if (!currentSection.empty() && !currentObject.texture.empty()) {
         currentObject.type = currentSection;
         objects.push_back(currentObject);
     }

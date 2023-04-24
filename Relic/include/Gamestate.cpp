@@ -12,7 +12,7 @@ public:
         state++;
     }
 
-bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture,  sf::Texture& rockTexture, sf::Texture& enemyTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window, const std::string& mapFileName)
+bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<sf::Texture>& enemyTextures, std::vector<sf::Texture>& rockTextures, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window, const std::string& mapFileName)
 {
     // Load the new map data
     objectList = readMapData(mapFileName);
@@ -27,29 +27,56 @@ bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockLis
         delete enemy;
     }
     enemies.clear();
+    enemyTextures.clear();
+    rockTextures.clear();
     Enemy::remainingEnemies = 0;
 
     // Load the new background texture and sprite
     if (!bgTexture.loadFromFile(objectList[0].texture)) { return false; }
     bgSprite.setTexture(bgTexture);
 
-    // Create new rocks and enemies based on the map data
+    //Assign PreLoaded Textures for Enemy
+    for (const auto& obj : objectList) {
+        if (obj.type == "Enemy") {
+            sf::Texture enemyTexture;
+            enemyTexture.loadFromFile(obj.getTexture());
+            enemyTextures.push_back(enemyTexture);
+            std::cout << "(Gamestate.cpp) Assigning Enemy Texture: " << obj.getTexture() << std::endl;
+        }
+    }
+
+    //Assign PreLoaded Textures for Rock
     for (const auto& obj : objectList) {
         if (obj.type.find("Rock") != std::string::npos) {
-            Rock rock(rockTexture);
+            sf::Texture rockTexture;
+            rockTexture.loadFromFile(obj.getTexture());
+            rockTextures.push_back(rockTexture);
+            std::cout << "(Gamestate.cpp) Assigning Rock Texture: " << obj.getTexture() << std::endl;
+        }
+    }
+
+    // Create new rocks and enemies based on the map data
+    int enemyTextureIteration = 0;
+    int rockTextureIteration = 0;
+    for (const auto& obj : objectList) {
+        if (obj.type.find("Rock") != std::string::npos) {
+            Rock rock(rockTextures[rockTextureIteration]);
             rock.setPosition(obj.posX, obj.posY);
             rock.setScale(obj.scaleX, obj.scaleY);
             rockList.push_back(rock);
+            rockTextureIteration++;
         }
         else if (obj.type == "Enemy") {
-            Enemy* newEnemy = new Enemy(enemyTexture);
+            Enemy* newEnemy = new Enemy();
             newEnemy->setPosition(obj.posX, obj.posY);
             newEnemy->setScale(obj.scaleX, obj.scaleY);
             newEnemy->setHealth(obj.health);
             newEnemy->setDamage(obj.damage);
             newEnemy->setScore(obj.score);
+            newEnemy->setTexture(enemyTextures[enemyTextureIteration]);
             Enemy::remainingEnemies++;
             enemies.push_back(newEnemy);
+            enemyTextureIteration++;
         }
     }
     // Set up the new player position, health, score, and input handler
@@ -74,7 +101,7 @@ bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<Rock>& rockLis
     return true;
 }
 
-void displayEndScreen(bool& endGame, bool& restartButtonIsPressed, std::vector<ObjectData>& objectList, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, sf::Texture& rockTexture, sf::Texture& enemyTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window) {
+void displayEndScreen(bool& endGame, bool& restartButtonIsPressed, std::vector<ObjectData>& objectList, std::vector<sf::Texture>& enemyTextures, std::vector<sf::Texture>& rockTextures, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window) {
     sf::Font font;
     if (!font.loadFromFile("Resources/Fonts/Zomboid.ttf")) {
         std::cerr << "Error loading font file." << std::endl;
@@ -123,7 +150,7 @@ void displayEndScreen(bool& endGame, bool& restartButtonIsPressed, std::vector<O
             std::cout << "(Gamestate.cpp) Restarting Game..." << std::endl;
             setState(1);
             endGame = false;
-            loadNextMap(objectList, rockList, enemies, projectileTexture, bgSprite, bgTexture, rockTexture, enemyTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
+            loadNextMap(objectList, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
         }
 
 

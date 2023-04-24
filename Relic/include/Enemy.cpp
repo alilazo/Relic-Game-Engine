@@ -8,6 +8,7 @@
 class Enemy : public sf::Sprite{
 public:
     Enemy(sf::Texture&);
+    Enemy() {};
     static int remainingEnemies;
     void setX(float);
     void setY(float);
@@ -59,7 +60,6 @@ void Enemy::setPosition(float xPos, float yPos){
     sf::Sprite::setPosition(xPos, yPos);
     x = xPos;
     y = yPos;
-    //std::cout << "Position for enemy set at X: " << getX() << " Y: " << getY() << "  Health: " << getHealth() << "  Dmg: " << getDamage() << " ScaleX: " << getScale().x << " ScaleY: " << getScale().y << std::endl;
 }
 
 void Enemy::setX(float xPos){

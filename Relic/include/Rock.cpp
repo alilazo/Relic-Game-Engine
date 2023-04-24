@@ -6,6 +6,7 @@
 
 class Rock : public sf::Sprite {
 public:
+
     Rock(sf::Texture& texture) {
         setTexture(texture);
         setOrigin(getLocalBounds().width / 2.f, getLocalBounds().height / 2.f); // set origin to center of image
@@ -15,6 +16,7 @@ public:
         float angle = dis(gen);
         setRotation(angle);
     }
+
     Rock(sf::Texture& texture, float x, float y) {
         setTexture(texture);
         setOrigin(getLocalBounds().width / 2.f, getLocalBounds().height / 2.f); // set origin to center of image
