@@ -45,11 +45,13 @@ int main()
         std::cout << "(main.cpp) PosX: " << objectList[i].getPosX() << "  PosY: " << objectList[i].getPosY() << "  ScaleX: " << objectList[i].getScaleX() << "  ScaleY: " << objectList[i].getScaleY() << std::endl;
     }
 
-    //Load the Key texture
-
     //Load the background texture
     sf::Texture bgTexture;
-    if(!bgTexture.loadFromFile(objectList[0].texture)){ return EXIT_FAILURE; }
+    for(const auto& obj : objectList){
+        if(obj.type.find("Background") != std::string::npos){
+            bgTexture.loadFromFile(obj.texture);
+        }
+    }
     sf::Sprite bgSprite(bgTexture);
 
     //Create the player
@@ -61,8 +63,15 @@ int main()
     }
     Player player(playerTexture);
 
-    player.setScale(objectList[1].scaleX, objectList[1].scaleY);
-    player.setPosition(objectList[1].posX, objectList[1].posY);
+    for(const auto& obj : objectList){
+        if(obj.type.find("Player") != std::string::npos){
+            player.setScale(obj.scaleX, obj.scaleY);
+            player.setPosition(obj.posX, obj.posY);
+        }
+    }
+
+    player.setKey(false);
+    std::cout << "(main.cpp) Player Does not have Key" << std::endl;
 
     //Rock Creation
     std::vector<sf::Texture> rockTextures;
@@ -312,16 +321,18 @@ int main()
         //Player Collision for key
         if(player.collidesWith(Key)){
             player.setKey(true);
+            Key.setPosition(1000, 1000);
+            std::cout << "(main.cpp) Player Picked Up Key" << std::endl;
         }
-
+        //std::cout << gamestate.getState() << std::endl;
         //Player collision with door for next level
         if(player.hasKey() && player.collidesWith(Door) && Enemy::remainingEnemies <= 0){
             gamestate.nextState();
             std::string nextMapFileName = "Maps/Room" + std::to_string(gamestate.getState()) + ".txt";
             std::cout << "(main.cpp) Loading Map: " << nextMapFileName << std::endl;
-            if(!gamestate.loadNextMap(objectList, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window, nextMapFileName)){
+            if(!gamestate.loadNextMap(objectList, playerTexture, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window, nextMapFileName)){
                 endGame = true;
-                gamestate.displayEndScreen(endGame, restartButtonIsPressed, objectList, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window);
+                gamestate.displayEndScreen(endGame, restartButtonIsPressed, playerTexture, objectList, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window);
             }
         }
 
@@ -363,7 +374,7 @@ int main()
                 player.setKey(false);
                 std::cout << "(Main.cpp) Restarting Game..." << std::endl;
                 gamestate.setState(1);
-                gamestate.loadNextMap(objectList, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
+                gamestate.loadNextMap(objectList, playerTexture, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
             }
 
             // Draw the "You Died" screen
