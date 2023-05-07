@@ -1,3 +1,11 @@
+/*
+This code defines the InputHandler class, which handles input events from the user.
+It includes the functions necessary to move the player sprite and to shoot a projectile from the player's position.
+The class also contains a pointer to the player sprite, a vector of projectiles, and variables to determine which movement keys are currently pressed.
+The setMovementHandler function takes in a setting argument that specifies which keyboard controls to use (arrows or WASD).
+The setPlayerPositionToMouse function sets the player's position based on the current mouse position.
+*/
+
 #ifndef INPUTHANDLER_H
 #define INPUTHANDLER_H
 #define _USE_MATH_DEFINES

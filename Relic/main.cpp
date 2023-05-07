@@ -1,3 +1,23 @@
+/*
+ * Function Name 1: readMapData
+ * Description: Reads the map data from a file and returns a vector of ObjectData structs.
+ *
+ * Function Name 2: initView
+ * Description: Initializes the game's view to show the correct area based on player position.
+ *
+ * Function Name 3: handleCollision
+ * Description: Handles the collision between an enemy and a projectile or player, updating health and score as needed.
+ *
+ * Function Name 4: nextState
+ * Description: Increments the game state to load the next level/map.
+ *
+ * Function Name 5: displayEndScreen
+ * Description: Displays the game over screen and handles restart button functionality.
+ *
+ * Function Name 6: main
+ * Description: The main function that runs the game loop and initializes all game objects.
+ */
+
 #include <SFML/Graphics.hpp>
 #include <Enemy.cpp>
 #include <InputHandler.cpp>

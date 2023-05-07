@@ -1,3 +1,12 @@
+/*
+
+This is a header file for the Player class, which inherits from sf::Sprite.
+The Player class represents the player's character in the game.
+It has private member variables for health, score, and whether the player possesses a key.
+The class has public functions for setting and getting the player's health, score, and key possession.
+There is also a function for handling collisions between the player and other sprites, which reduces the player's health based on the damage received.
+*/
+
 #ifndef PLAYER_H
 #define PLAYER_H
 

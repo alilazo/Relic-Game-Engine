@@ -1,3 +1,14 @@
+/*
+trim: This function removes leading and trailing whitespace from a given string.
+
+readMapData: This function reads in object data from a text file that defines the game map.
+It parses the data in the file and returns a vector of ObjectData objects that contain information on the objects that need to be created in the game.
+
+initView: This function initializes the game view based on the visible area of the game background, the player's position, and the player's radius.
+
+KeyDropped: This is a boolean variable that is used to keep track of whether the key has been dropped by the last enemy that is killed in the game.
+*/
+
 #ifndef MAIN_FUNCTIONS_H
 #define MAIN_FUNCTIONS_H
 

@@ -1,3 +1,10 @@
+/*
+
+This header file defines a class ObjectData with data members and getter functions.
+The class is used to store data about objects in the game, such as their type, texture, position, scale, health, damage, and score.
+The class also has two constructors - one with parameters and one without. The class and its members are wrapped in an include guard.
+*/
+
 #ifndef OBJECTDATA_H
 #define OBJECTDATA_H
 

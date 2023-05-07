@@ -1,3 +1,15 @@
+/*
+This is the header file for the Health class, which inherits from sf::Text.
+The Health class is responsible for displaying and managing the player's health in the game.
+
+The class contains private variables such as the player's health, font, and font size.
+The constructor initializes the font and the player's initial health, and creates and positions the text object.
+The updateText() function updates the text object with the current player's health value.
+
+The class also contains public functions for decreasing, increasing, and setting the player's health,
+changing the font and font size, and setting the font file.
+*/
+
 #ifndef HEALTH_H
 #define HEALTH_H
 #include <SFML/Graphics.hpp>

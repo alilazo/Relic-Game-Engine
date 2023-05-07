@@ -1,3 +1,10 @@
+/*
+This is a header file defining the Score class, which inherits from sf::Text.
+The class provides methods to update, set and get the score.
+It also sets the font file, size and position for the text. The score is displayed with the string "Score: " before the actual score value.
+The addScore method increases the score by a given amount and updates the text accordingly.
+*/
+
 #ifndef SCORE_H
 #define SCORE_H
 class Score : public sf::Text {

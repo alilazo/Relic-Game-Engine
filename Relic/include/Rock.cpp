@@ -1,3 +1,8 @@
+/*
+This code defines the Rock class, which inherits from sf::Sprite.
+It has two constructors, one that takes a texture and sets a random rotation angle, and another that additionally sets the position of the rock.
+*/
+
 #ifndef ROCK_H
 #define ROCK_H
 #include <SFML/Graphics.hpp>
