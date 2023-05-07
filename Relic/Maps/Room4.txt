@@ -37,7 +37,7 @@ Health = 100
 Damage = 25
 Scale = 0.3 0.3
 Score = 10
-Texture = Resources/enemy.png
+Texture = Resources/HellsMaze/enemy.png
 [Enemy]
 
 [Enemy]
@@ -46,5 +46,5 @@ Scale = 0.3 0.3
 Health = 200
 Damage = 15
 Score = 20
-Texture = Resources/enemy.png
+Texture = Resources/HellsMaze/enemy.png
 [Enemy]

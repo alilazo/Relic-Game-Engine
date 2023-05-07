@@ -9,7 +9,7 @@ Texture = Resources/Overworld/Overworld.png
 [Player]
 Position = 120.0 120.0
 Scale = 0.3 0.3
-Texture = Resources/player.png
+Texture = Resources/PixelPlayer.png
 [Player]
 
 [Door]
@@ -21,14 +21,20 @@ Texture = Resources/Door.png
 [Rock1]
 Position = 240 250
 Scale = 0.1 0.1
-Texture = Resources/rock.png
+Texture = Resources/Overworld/rock.png
 [Rock1]
 
 
 [Rock2]
 Position = 350 350
 Scale = 0.1 0.1
-Texture = Resources/rock.png
+Texture = Resources/Overworld/rock.png
+[Rock2]
+
+[Rock2]
+Position = 550 350
+Scale = 0.1 0.1
+Texture = Resources/Overworld/rock.png
 [Rock2]
 
 [Enemy]

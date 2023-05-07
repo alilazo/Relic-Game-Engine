@@ -12,7 +12,7 @@ public:
         state++;
     }
 
-bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<sf::Texture>& enemyTextures, std::vector<sf::Texture>& rockTextures, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window, const std::string& mapFileName)
+bool loadNextMap(std::vector<ObjectData>& objectList,  sf::Texture& playerTexture, std::vector<sf::Texture>& enemyTextures, std::vector<sf::Texture>& rockTextures, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window, const std::string& mapFileName)
 {
     // Load the new map data
     objectList = readMapData(mapFileName);
@@ -32,7 +32,13 @@ bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<sf::Texture>& 
     Enemy::remainingEnemies = 0;
 
     // Load the new background texture and sprite
-    if (!bgTexture.loadFromFile(objectList[0].texture)) { return false; }
+    for(const auto& obj : objectList){
+        if(obj.type.find("Background") != std::string::npos){
+            bgTexture.loadFromFile(obj.texture);
+            std::cout << "(Gamestate.cpp) Assigning Background Texture: " << obj.getTexture() << std::endl;
+
+        }
+    }
     bgSprite.setTexture(bgTexture);
 
     //Assign PreLoaded Textures for Enemy
@@ -80,11 +86,18 @@ bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<sf::Texture>& 
         }
     }
     // Set up the new player position, health, score, and input handler
-    player.setPosition(objectList[1].posX, objectList[1].posY);
-    player.setScale(objectList[1].scaleX, objectList[1].scaleY);
-    player.setHealth(playerHealth.getHealth());
-    player.setScore(score.getScore());
-    gameInput.setProjectileTexture(projectileTexture);
+    for(const auto& obj : objectList){
+        if(obj.type.find("Player") != std::string::npos){
+            playerTexture.loadFromFile(obj.texture);
+            player.setPosition(obj.posX, obj.posY);
+            player.setScale(obj.scaleX, obj.scaleY);
+            player.setHealth(playerHealth.getHealth());
+            player.setScore(score.getScore());
+            player.setTexture(playerTexture);
+            gameInput.setProjectileTexture(projectileTexture);
+            std::cout << "(Gamestate.cpp) Assigning Player Texture: " << obj.getTexture() << std::endl;
+        }
+    }
 
     // Set up the new background bounds and camera view
     bgBounds = bgSprite.getLocalBounds();
@@ -101,7 +114,7 @@ bool loadNextMap(std::vector<ObjectData>& objectList, std::vector<sf::Texture>& 
     return true;
 }
 
-void displayEndScreen(bool& endGame, bool& restartButtonIsPressed, std::vector<ObjectData>& objectList, std::vector<sf::Texture>& enemyTextures, std::vector<sf::Texture>& rockTextures, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window) {
+void displayEndScreen(bool& endGame, bool& restartButtonIsPressed, sf::Texture& playerTexture, std::vector<ObjectData>& objectList, std::vector<sf::Texture>& enemyTextures, std::vector<sf::Texture>& rockTextures, std::vector<Rock>& rockList, std::vector<Enemy*>& enemies, sf::Texture projectileTexture, sf::Sprite& bgSprite, sf::Texture& bgTexture, Player& player, InputHandler& gameInput, Health& playerHealth, Score& score, sf::View& view, sf::FloatRect& bgBounds, sf::RenderWindow& window) {
     sf::Font font;
     if (!font.loadFromFile("Resources/Fonts/Zomboid.ttf")) {
         std::cerr << "Error loading font file." << std::endl;
@@ -150,7 +163,7 @@ void displayEndScreen(bool& endGame, bool& restartButtonIsPressed, std::vector<O
             std::cout << "(Gamestate.cpp) Restarting Game..." << std::endl;
             setState(1);
             endGame = false;
-            loadNextMap(objectList, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
+            loadNextMap(objectList, playerTexture, enemyTextures, rockTextures, rockList, enemies, projectileTexture, bgSprite, bgTexture, player, gameInput, playerHealth, score, view, bgBounds, window, "Maps/Room1.txt");
         }
 
 
